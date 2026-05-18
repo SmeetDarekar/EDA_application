@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Ingest Metadata{% endblock %}
+{% block content %}
+<div class="page-hdr">
+  <h1>Ingest Table Metadata</h1>
+  <p>Paste the raw metadata JSON for any table. Versioning is handled automatically.</p>
+</div>
+
+{% if error %}<div class="alert alert-err">{{ error }}</div>{% endif %}
+
+<div class="form-card">
+  <form method="POST" action="{{ url_for('ingest_submit') }}">
+    <div class="form-row two-col">
+      <div class="form-group">
+        <label for="table_name">Table Name <span class="req">*</span></label>
+        <input type="text" id="table_name" name="table_name" placeholder="e.g. CREDIT_SCORE_ABT" required>
+        <span class="hint">Unique identifier for this dataset across all versions.</span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="metadata_json">Metadata JSON <span class="req">*</span></label>
+      <textarea id="metadata_json" name="metadata_json" rows="18"
+        placeholder='Paste the full metadata response here. Must contain an "items" array of column descriptors.'></textarea>
+      <span class="hint">Accepts the full SAS catalog API response or a bare list of column items.</span>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Ingest →</button>
+      <button type="button" class="btn-sec" onclick="loadSample()">Load Sample</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function loadSample() {
+  const sample = {
+    "abt_snapshot": {"name": "SAMPLE_TABLE", "row_count": 1000, "snapshot_date": "2026-05-13"},
+    "items": [
+      {"name": "customer_id", "attributes": {"dataType": "num", "casDataType": "double", "statisticalScale": "id", "completenessPercent": 100, "cardinalityCount": 1000, "uniquenessPercent": 100, "hasUniqueField": true, "missingCount": 0, "ordinalPosition": 1}},
+      {"name": "age", "attributes": {"dataType": "num", "casDataType": "double", "statisticalScale": "interval", "completenessPercent": 100, "cardinalityCount": 45, "uniquenessPercent": 4.5, "mean": 42.3, "median": 43, "standardDeviation": 13.2, "min": 18, "max": 75, "skewness": -0.12, "quantiles25": 31, "quantiles50": 43, "quantiles75": 54, "hasOutliers": false, "nOutliers": 0, "missingCount": 0, "ordinalPosition": 2, "informationPrivacy": "private", "semanticTypeId": "AGE"}},
+      {"name": "income", "attributes": {"dataType": "num", "casDataType": "double", "statisticalScale": "interval", "completenessPercent": 94, "cardinalityCount": 88, "uniquenessPercent": 8.8, "mean": 62000, "median": 58000, "standardDeviation": 24000, "min": 18000, "max": 120000, "skewness": 0.82, "quantiles25": 42000, "quantiles50": 58000, "quantiles75": 79000, "hasOutliers": true, "nOutliers": 7, "missingCount": 60, "ordinalPosition": 3}},
+      {"name": "target", "attributes": {"dataType": "num", "casDataType": "double", "statisticalScale": "binary", "completenessPercent": 100, "cardinalityCount": 2, "uniquenessPercent": 0.2, "mean": 0.28, "median": 0, "standardDeviation": 0.449, "min": 0, "max": 1, "skewness": 0.98, "missingCount": 0, "ordinalPosition": 4}}
+    ]
+  };
+  document.getElementById('metadata_json').value = JSON.stringify(sample, null, 2);
+  document.getElementById('table_name').value = 'SAMPLE_TABLE';
+}
+</script>
+{% endblock %}

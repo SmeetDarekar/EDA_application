@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Compare — Select{% endblock %}
+{% block content %}
+<div class="page-hdr">
+  <h1>Compare ABT Versions</h1>
+  <p>Select a table and then choose which versions to compare.</p>
+</div>
+
+{% if error %}<div class="alert alert-err">{{ error }}</div>{% endif %}
+
+<div class="form-card">
+  {# Step 1: choose table #}
+  <form method="POST" action="{{ url_for('compare_versions') }}">
+    <div class="form-row two-col">
+      <div class="form-group">
+        <label>Table Name <span class="req">*</span></label>
+        <select name="table_name" required onchange="this.form.submit()">
+          <option value="" disabled {% if not selected_table %}selected{% endif %}>— Select table —</option>
+          {% for t in tables %}
+          <option value="{{ t.table_name }}" {% if selected_table == t.table_name %}selected{% endif %}>
+            {{ t.table_name }} ({{ t.version_count }} versions)
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </form>
+
+  {# Step 2: choose versions (only shown after table selected) #}
+  {% if versions %}
+  <form method="POST" action="{{ url_for('compare_run') }}" style="margin-top:1.5rem">
+    <input type="hidden" name="table_name" value="{{ selected_table }}">
+    <div class="form-group">
+      <label>Select Versions to Compare <span class="req">*</span>
+        <span class="optional">(hold Ctrl/Cmd for multi-select)</span></label>
+      <select name="versions" multiple size="{{ [versions | length, 8] | min }}" style="min-height:120px">
+        {% for v in versions %}
+        <option value="{{ v.version }}">
+          v{{ v.version }} — created {{ v.created_at[:10] }} · last seen {{ v.last_seen[:10] }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-actions">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+        <input type="checkbox" name="use_llm" id="use_llm" style="width:auto">
+        <label for="use_llm" style="margin:0;font-weight:400;">
+          Enrich with AI narrative <span class="optional">(requires API key)</span>
+        </label>
+      </div>
+      <button type="submit" class="btn-primary">Run Comparison →</button>
+    </div>
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Ingest Result{% endblock %}
+{% block content %}
+<div class="page-hdr">
+  <h1>Ingest Complete</h1>
+</div>
+
+<div class="result-card
+  {% if result.action == 'registered' %}rc-green
+  {% elif result.action == 'version_added' %}rc-blue
+  {% else %}rc-gray{% endif %}">
+
+  <div class="rc-icon">
+    {% if result.action == 'registered' %}✓
+    {% elif result.action == 'version_added' %}+
+    {% else %}={% endif %}
+  </div>
+
+  <div class="rc-body">
+    {% if result.action == 'registered' %}
+      <h2>Table registered as Version 1</h2>
+      <p>First time seeing <code>{{ table_name }}</code>. Stored as version 1.</p>
+    {% elif result.action == 'version_added' %}
+      <h2>New version created — Version {{ result.version }}</h2>
+      <p>Metadata for <code>{{ table_name }}</code> differs from previous versions. Stored as version {{ result.version }}.</p>
+    {% else %}
+      <h2>No change — Version {{ result.version }}</h2>
+      <p>The submitted metadata is identical to version {{ result.version }} of <code>{{ table_name }}</code>. Last-seen timestamp updated.</p>
+    {% endif %}
+
+    <div class="meta-pills">
+      <span class="pill">Table: {{ table_name }}</span>
+      <span class="pill">Version: {{ result.version }}</span>
+      <span class="pill mono">Hash: {{ result.hash[:12] }}…</span>
+    </div>
+  </div>
+</div>
+
+<div class="form-actions" style="margin-top:1.5rem;">
+  <a href="{{ url_for('analyze_run') }}" class="btn-primary"
+    onclick="this.closest('div').insertAdjacentHTML('beforebegin',
+      '<form id=af method=POST action=\'{{ url_for(\'analyze_run\') }}\'><input name=table_name value=\'{{ table_name }}\'><input name=version value=\'{{ result.version }}\'></form>');
+      document.getElementById('af').submit(); return false;">
+    Analyze this version →
+  </a>
+  <a href="{{ url_for('ingest_page') }}" class="btn-sec">Ingest another</a>
+  <a href="{{ url_for('home') }}" class="btn-sec">Home</a>
+</div>
+{% endblock %}

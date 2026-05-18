@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}RMEDA — Home{% endblock %}
+{% block content %}
+<div class="hero">
+  <h1>Risk Modeling <span>EDA Service</span></h1>
+  <p>Universal metadata analysis platform. Ingest any tabular dataset metadata, inspect its health, and compare versions to detect drift before it reaches production.</p>
+  <div class="mode-grid">
+    <a href="{{ url_for('ingest_page') }}" class="mode-card ingest">
+      <div class="mc-icon">⬆</div>
+      <h2>Ingest</h2>
+      <p>Register a table's metadata. Versioning is automatic — same data updates timestamp, new structure creates a new version.</p>
+    </a>
+    <a href="{{ url_for('analyze_select') }}" class="mode-card analyze">
+      <div class="mc-icon">⚙</div>
+      <h2>Analyze</h2>
+      <p>Full 7-section health check: blockers, warnings, governance risks, target analysis, and readiness classification.</p>
+    </a>
+    <a href="{{ url_for('compare_select') }}" class="mode-card compare">
+      <div class="mc-icon">⇌</div>
+      <h2>Compare</h2>
+      <p>Compare two or more versions of a table. Detect schema changes, distribution drift, target shift, and quality regressions.</p>
+    </a>
+  </div>
+</div>
+
+{% if tables %}
+<section class="section-card">
+  <h2 class="sec-title">Registered Tables</h2>
+  <table class="data-table">
+    <thead><tr><th>Table</th><th>Versions</th><th>Registered</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for t in tables %}
+    <tr>
+      <td><code>{{ t.table_name }}</code></td>
+      <td>{{ t.version_count }}</td>
+      <td>{{ t.created_at[:10] }}</td>
+      <td>
+        <form method="POST" action="{{ url_for('analyze_run') }}" style="display:inline">
+          <input type="hidden" name="table_name" value="{{ t.table_name }}">
+          <input type="hidden" name="version" value="{{ t.versions[-1].version }}">
+          <button type="submit" class="btn-sm btn-blue">Analyze latest</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

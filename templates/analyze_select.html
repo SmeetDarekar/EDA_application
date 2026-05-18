@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Analyze — Select{% endblock %}
+{% block content %}
+<div class="page-hdr">
+  <h1>Analyze ABT</h1>
+  <p>Select a registered table and version to run a full 7-section analysis.</p>
+</div>
+
+<div class="form-card">
+  <form method="POST" action="{{ url_for('analyze_run') }}">
+    <div class="form-row two-col">
+      <div class="form-group">
+        <label for="table_name">Table Name <span class="req">*</span></label>
+        <select name="table_name" id="table_name" required onchange="updateVersions(this)">
+          <option value="" disabled selected>— Select table —</option>
+          {% for t in tables %}
+          <option value="{{ t.table_name }}" data-versions='{{ t.versions | tojson }}'>{{ t.table_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="version">Version <span class="req">*</span></label>
+        <select name="version" id="version" required>
+          <option value="" disabled selected>— Select table first —</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="target_col">Target Column <span class="optional">(optional — auto-detected)</span></label>
+      <input type="text" name="target_col" id="target_col" placeholder="e.g. target, bad, default">
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:.75rem;">
+      <input type="checkbox" name="use_llm" id="use_llm" style="width:auto">
+      <label for="use_llm" style="margin:0;font-weight:400;">
+        Enrich with AI narrative <span class="optional">(requires API key in environment)</span>
+      </label>
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Run Analysis →</button>
+    </div>
+  </form>
+</div>
+
+<script>
+function updateVersions(sel) {
+  const vs = JSON.parse(sel.selectedOptions[0].dataset.versions || '[]');
+  const vsel = document.getElementById('version');
+  vsel.innerHTML = '';
+  vs.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v.version;
+    o.textContent = `v${v.version}  (${v.created_at.slice(0,10)})`;
+    vsel.appendChild(o);
+  });
+  if (vs.length) vsel.value = vs[vs.length - 1].version;
+}
+</script>
+{% endblock %}

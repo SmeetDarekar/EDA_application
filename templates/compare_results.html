@@ -1,0 +1,537 @@
+{% extends "base.html" %}
+{% block title %}Compare — {{ version_labels | join(' vs ') }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('home') }}">Home</a> / <a href="{{ url_for('compare_select') }}">Compare</a>
+  / {{ version_labels | join(' → ') }}
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   VERSION STRIP + METRIC CARDS  (C1)
+══════════════════════════════════════════════════════════ #}
+<div class="page-hdr">
+  <h1>Version Comparison</h1>
+  <span class="sub">{{ version_labels | join(' → ') }}</span>
+</div>
+
+<div class="version-strip">
+  {% for v in r.c1.versions %}
+  <div class="ver-pill">
+    <div class="vp-name">{{ v.name }}</div>
+    <div class="vp-meta">v{{ v.version }} · {{ v.snapshot_date }} · {{ "{:,}".format(v.row_count) }} rows · {{ v.col_count }} cols</div>
+  </div>
+  {% if not loop.last %}<div class="ver-arrow">→</div>{% endif %}
+  {% endfor %}
+</div>
+
+{% for pw in r.c1.pairwise %}
+<div class="metric-grid">
+  <div class="metric-card {% if pw.row_delta > 0 %}mc-green{% elif pw.row_delta < 0 %}mc-red{% endif %}">
+    <div class="mv">{{ '+' if pw.row_delta > 0 }}{{ "{:,}".format(pw.row_delta) }}</div>
+    <div class="ml">Row delta</div>
+  </div>
+  <div class="metric-card {% if pw.added_columns %}mc-blue{% endif %}">
+    <div class="mv">{{ pw.added_columns | length }}</div><div class="ml">Columns added</div>
+  </div>
+  <div class="metric-card {% if pw.dropped_columns %}mc-amber{% endif %}">
+    <div class="mv">{{ pw.dropped_columns | length }}</div><div class="ml">Columns dropped</div>
+  </div>
+  <div class="metric-card {% if pw.worsened %}mc-red{% endif %}">
+    <div class="mv">{{ pw.worsened | length }}</div><div class="ml">Readiness worsened</div>
+  </div>
+  <div class="metric-card {% if pw.improved %}mc-green{% endif %}">
+    <div class="mv">{{ pw.improved | length }}</div><div class="ml">Readiness improved</div>
+  </div>
+  <div class="metric-card">
+    <div class="mv">{{ pw.stable | length }}</div><div class="ml">Stable</div>
+  </div>
+</div>
+{% endfor %}
+
+{# ══════════════════════════════════════════════════════════
+   C0  VERDICT + VERSION STORY  (LLM narrative at top)
+══════════════════════════════════════════════════════════ #}
+{% if r.c0.verdict %}
+<div class="verdict-banner verdict-{{ r.c0.verdict | lower | replace('_','-') }}">
+  <div class="vb-left">
+    <div class="vb-verdict">{{ r.c0.verdict | replace('_',' ') }}</div>
+    <div class="vb-msg">{{ r.c0.message }}</div>
+    {% if r.c0.issues %}
+    <ul class="vb-issues">
+      {% for iss in r.c0.issues %}<li>{{ iss }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+
+{# VERSION STORY — Feature 10, only shown when LLM enrichment ran #}
+{% if r.version_story %}
+<div class="story-card">
+  <div class="story-label">AI Summary</div>
+  <div class="story-text">{{ r.version_story }}</div>
+</div>
+{% endif %}
+
+{# LLM narrative for C0 if available #}
+{% if r.c0.narrative and r.c0.narrative != r.c0.message %}
+<div class="narrative-card">
+  <div class="nc-label">Analysis</div>
+  <div class="nc-text">{{ r.c0.narrative }}</div>
+</div>
+{% endif %}
+
+{# ══════════════════════════════════════════════════════════
+   C2  SCHEMA CHANGES
+══════════════════════════════════════════════════════════ #}
+<details class="section-card"
+  {% for ch in r.c2 %}{% if ch.added or ch.dropped or ch.type_changed %}open{% endif %}{% endfor %}>
+  <summary class="sec-hdr">
+    C2 · Schema Changes
+    {% set total_changes = namespace(n=0) %}
+    {% for ch in r.c2 %}{% set total_changes.n = total_changes.n + ch.added|length + ch.dropped|length + ch.type_changed|length %}{% endfor %}
+    {% if total_changes.n > 0 %}<span class="sec-badge badge-amber">{{ total_changes.n }} change{{ 's' if total_changes.n != 1 }}</span>{% else %}<span class="sec-badge badge-green">No changes</span>{% endif %}
+  </summary>
+  {% for ch in r.c2 %}
+  <div class="schema-block">
+    <div class="schema-pair">{{ ch.from }} → {{ ch.to }}</div>
+    {% if ch.added %}
+    <div class="schema-group">
+      <div class="sg-label badge-blue">Added ({{ ch.added | length }})</div>
+      {% for col in ch.added %}
+      <div class="schema-row">
+        <code>{{ col.column }}</code>
+        <span class="tag">{{ col.data_type }}</span><span class="tag">{{ col.scale }}</span>
+        <span class="tag">{{ col.completeness }}% complete</span>
+        <span class="schema-note">{{ col.note }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if ch.dropped %}
+    <div class="schema-group">
+      <div class="sg-label badge-amber">Dropped ({{ ch.dropped | length }})</div>
+      {% for col in ch.dropped %}
+      <div class="schema-row">
+        <code>{{ col.column }}</code>
+        <span class="tag tag-red">last {{ col.last_completeness }}%</span>
+        <span class="schema-note">{{ col.note }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if ch.type_changed %}
+    <div class="schema-group">
+      <div class="sg-label badge-amber">Type Changed ({{ ch.type_changed | length }})</div>
+      {% for col in ch.type_changed %}
+      <div class="schema-row">
+        <code>{{ col.column }}</code>
+        <span class="tag tag-red">{{ col.from_type }}</span> → <span class="tag tag-blue">{{ col.to_type }}</span>
+        <span class="schema-note">{{ col.note }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if not ch.added and not ch.dropped and not ch.type_changed %}
+    <p class="empty-state">✓ No schema changes.</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C3  COMPLETENESS DRIFT  — now includes missing_pattern (Feature 5)
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" open>
+  <summary class="sec-hdr">
+    C3 · Completeness &amp; Missingness Patterns
+    {% set problem_rows = r.c3.rows | selectattr('missing_pattern', 'in', ['growing_missing','newly_missing','sparse']) | list %}
+    {% if problem_rows %}<span class="sec-badge badge-red">{{ problem_rows | length }} problem{{ 's' if problem_rows|length != 1 }}</span>{% endif %}
+  </summary>
+
+  {# Pattern legend #}
+  <div class="pattern-legend">
+    <span class="pl-title">Pattern key:</span>
+    <span class="tag mp-growing_missing">growing_missing</span> pipeline degrading &nbsp;·&nbsp;
+    <span class="tag mp-newly_missing">newly_missing</span> recent regression &nbsp;·&nbsp;
+    <span class="tag mp-sparse">sparse</span> always low &nbsp;·&nbsp;
+    <span class="tag mp-recovering">recovering</span> improving &nbsp;·&nbsp;
+    <span class="tag mp-stable_missing">stable_missing</span> structural absence &nbsp;·&nbsp;
+    <span class="tag mp-complete">complete</span> no issue
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for lbl in r.c3.version_labels %}<th>{{ lbl }}</th>{% endfor %}
+        <th>Net Δ</th>
+        <th>Pattern</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in r.c3.rows %}
+    <tr {% if row.missing_pattern in ['growing_missing','newly_missing','sparse'] %}class="row-highlight"{% elif row.changes %}class="has-change"{% endif %}>
+      <td><code>{{ row.column }}</code></td>
+      {% for val in row['values'] %}
+      <td>
+        {% if val is not none %}
+        <div class="bar-wrap">
+          <div class="bar-bg">
+            <div class="bar-fill
+              {% if val == 100 %}fill-green{% elif val >= 50 %}fill-amber{% else %}fill-red{% endif %}"
+              style="width:{{ val }}%"></div>
+          </div>
+          <span>{{ val }}%</span>
+        </div>
+        {% else %}<span class="tag tag-gray">absent</span>{% endif %}
+      </td>
+      {% endfor %}
+      <td>
+        {% if row.net_delta is not none %}
+        <span class="delta {% if row.net_delta > 0 %}delta-up{% elif row.net_delta < 0 %}delta-down{% endif %}">
+          {{ '+' if row.net_delta > 0 }}{{ row.net_delta }}pp
+        </span>
+        {% endif %}
+      </td>
+      <td>
+        <span class="tag mp-{{ row.missing_pattern }}">{{ row.missing_pattern | replace('_',' ') }}</span>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C4  DISTRIBUTION DRIFT
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" open>
+  <summary class="sec-hdr">
+    C4 · Distribution Drift (Numeric Features)
+    {% set critical_cols = r.c4 | selectattr('overall_severity','eq','critical') | list %}
+    {% set notable_cols  = r.c4 | selectattr('overall_severity','eq','notable')  | list %}
+    {% if critical_cols %}<span class="sec-badge badge-red">{{ critical_cols|length }} critical</span>{% endif %}
+    {% if notable_cols  %}<span class="sec-badge badge-amber">{{ notable_cols|length }} notable</span>{% endif %}
+  </summary>
+  {% if not r.c4 %}
+  <p class="empty-state">No numeric features available for drift analysis.</p>
+  {% else %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for lbl in version_labels %}<th>{{ lbl }}<br><small>mean / skew / outliers</small></th>{% endfor %}
+        <th>Drift</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for col in r.c4 %}
+    <tr>
+      <td><code>{{ col.column }}</code><br><span class="tag">{{ col.scale }}</span></td>
+      {% for vs in col.version_stats %}
+      <td>
+        {% if vs.get('mean') is not none %}
+        <div class="stat-cell">
+          <span>μ {{ "%.2f"|format(vs.mean) }}</span>
+          <span>sk {{ "%.2f"|format(vs.skewness) if vs.skewness is not none else '—' }}</span>
+          {% if vs.has_outliers %}<span class="tag tag-red">{{ vs.n_outliers }} outliers</span>{% endif %}
+        </div>
+        {% else %}<span class="tag tag-gray">absent</span>{% endif %}
+      </td>
+      {% endfor %}
+      <td><span class="drift-badge drift-{{ col.overall_severity }}">{{ col.overall_severity }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C5  TARGET DRIFT
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.c5 %}open{% endif %}>
+  <summary class="sec-hdr">C5 · Target Variable Drift</summary>
+  {% if not r.c5 %}
+  <p class="empty-state">No target column detected.</p>
+  {% else %}
+  <div class="target-grid">
+    {% for vr in r.c5.version_rates %}
+    <div class="tg-card">
+      <div class="tg-val">{{ vr.event_rate }}%</div>
+      <div class="tg-lbl">{{ vr.abt }}<br>event rate</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% for pw in r.c5.pairwise_drift %}
+  <div class="drift-alert drift-{{ pw.severity }}">
+    <strong>{{ pw.from_ver }} → {{ pw.to_ver }}</strong>:
+    Event rate shifted <strong>{{ '+' if pw.delta_pp > 0 }}{{ pw.delta_pp }}pp</strong>
+    · Severity: <strong>{{ pw.severity | upper }}</strong>
+    {% if pw.back_test_required %}
+    · <span class="tag tag-red">Back-testing required before model promotion</span>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C6  QUALITY REGRESSION
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.c6 %}open{% endif %}>
+  <summary class="sec-hdr">C6 · Data Quality Regression Tracker</summary>
+  {% if not r.c6 %}
+  <p class="empty-state">✓ No mismatch or blank-value issues across any version.</p>
+  {% else %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for lbl in version_labels %}<th>{{ lbl }}<br><small>mismatches / blanks</small></th>{% endfor %}
+        <th>Trend</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in r.c6 %}
+    <tr>
+      <td><code>{{ row.column }}</code></td>
+      {% for i in range(row.mismatch_values | length) %}
+      <td>
+        <span class="{% if row.mismatch_values[i] %}tag tag-red{% else %}tag{% endif %}">
+          {{ row.mismatch_values[i] or 0 }} mm
+        </span>
+        / <span class="tag">{{ row.blank_values[i] or 0 }} bl</span>
+      </td>
+      {% endfor %}
+      <td><span class="trend-badge trend-{{ row.mismatch_trend }}">{{ row.mismatch_trend }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C7  READINESS CHANGE
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" open>
+  <summary class="sec-hdr">C7 · Modeling Readiness Change</summary>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for lbl in version_labels %}<th>{{ lbl }}</th>{% endfor %}
+        <th>Change</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for row in r.c7 %}
+    <tr {% if row.highlight %}class="row-highlight"{% endif %}>
+      <td><code>{{ row.column }}</code></td>
+      {% for st in row.statuses %}
+      <td>
+        {% if st == 'absent' %}
+          <span class="tag tag-gray">absent</span>
+        {% else %}
+          <span class="status-badge status-{{ st }}">{{ st }}</span>
+        {% endif %}
+      </td>
+      {% endfor %}
+      <td><span class="change-badge change-{{ row.change_type }}">{{ row.change_type }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C8  PSI MATRIX  + LLM narrative
+══════════════════════════════════════════════════════════ #}
+<details class="section-card">
+  <summary class="sec-hdr">
+    C8 · Population Stability Index (PSI)
+    <span class="sec-badge badge-green">{{ r.c8.summary.stable_count }} stable</span>
+    {% if r.c8.summary.monitor_count %}<span class="sec-badge badge-amber">{{ r.c8.summary.monitor_count }} monitor</span>{% endif %}
+    {% if r.c8.summary.shift_count %}<span class="sec-badge badge-red">{{ r.c8.summary.shift_count }} shift</span>{% endif %}
+  </summary>
+
+  <div class="psi-legend">
+    PSI &lt; 0.10 = <span class="drift-badge drift-stable">stable</span> &nbsp;
+    0.10–0.25 = <span class="drift-badge drift-notable">monitor</span> &nbsp;
+    &gt; 0.25 = <span class="drift-badge drift-critical">shift</span>
+    &nbsp;— industry standard from Basel risk modeling
+  </div>
+
+  {% if r.c8.narrative %}
+  <div class="narrative-card" style="margin-bottom:1rem;">
+    <div class="nc-label">PSI Interpretation</div>
+    <div class="nc-text">{{ r.c8.narrative }}</div>
+  </div>
+  {% endif %}
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for i in range(r.c8.version_labels | length - 1) %}
+        <th>{{ r.c8.version_labels[i] }} → {{ r.c8.version_labels[i+1] }}</th>
+        {% endfor %}
+        <th>Worst</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for col in r.c8.columns %}
+    <tr>
+      <td><code>{{ col.column }}</code></td>
+      {% for pair in col.pairs %}
+      <td>
+        {% if pair.applicable and pair.psi is not none %}
+          <span class="drift-badge drift-{{ pair.label }}">{{ pair.psi }}</span>
+        {% else %}
+          <span class="tag tag-gray">{{ pair.label }}</span>
+        {% endif %}
+      </td>
+      {% endfor %}
+      <td><span class="drift-badge drift-{{ col.worst_label }}">{{ col.worst_label }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C9  HEALTH SCORE TREND  — Feature 7: trend line
+══════════════════════════════════════════════════════════ #}
+<details class="section-card">
+  <summary class="sec-hdr">C9 · Health Score Trend Across Versions</summary>
+
+  {# Dataset-level scores + trend line — Feature 7 #}
+  <div class="trend-header">
+    <div class="trend-scores">
+      {% for ds in r.c9.dataset_scores %}
+      <div class="ts-pill">
+        <div class="ts-score {% if ds.score >= 80 %}ts-good{% elif ds.score >= 60 %}ts-fair{% else %}ts-poor{% endif %}">
+          {{ ds.score }}
+        </div>
+        <div class="ts-label">{{ ds.abt }}</div>
+        <div class="ts-badge">{{ ds.label | replace('_',' ') }}</div>
+      </div>
+      {% if not loop.last %}<div class="ts-arrow">→</div>{% endif %}
+      {% endfor %}
+    </div>
+    {% if r.c9.trend_slope is not none %}
+    <div class="trend-line-note
+      {% if r.c9.trend_direction in ['strongly_improving','improving'] %}tln-good
+      {% elif r.c9.trend_direction in ['strongly_declining','declining'] %}tln-bad
+      {% else %}tln-neutral{% endif %}">
+      <strong>Trend:</strong> {{ r.c9.trend_note }}
+    </div>
+    {% else %}
+    <div class="trend-line-note tln-neutral">{{ r.c9.trend_note }}</div>
+    {% endif %}
+  </div>
+
+  <table class="data-table" style="margin-top:1rem;">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for lbl in r.c9.version_labels %}<th>{{ lbl }}<br><small>score /100</small></th>{% endfor %}
+        <th>Trend</th>
+        <th>Δ first→last</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for col in r.c9.columns %}
+    <tr {% if col.highlight %}class="row-highlight"{% endif %}>
+      <td><code>{{ col.column }}</code></td>
+      {% for sc in col.scores %}
+      <td>
+        {% if sc is not none %}
+        <div class="score-chip
+          {% if sc >= 80 %}sc-good{% elif sc >= 55 %}sc-fair{% elif sc >= 30 %}sc-poor{% else %}sc-critical{% endif %}">
+          {{ sc }}
+        </div>
+        {% else %}<span class="tag tag-gray">absent</span>{% endif %}
+      </td>
+      {% endfor %}
+      <td><span class="trend-badge trend-{{ col.trend }}">{{ col.trend }}</span></td>
+      <td>
+        {% if col.delta is not none %}
+        <span class="delta {% if col.delta > 0 %}delta-up{% elif col.delta < 0 %}delta-down{% endif %}">
+          {{ '+' if col.delta > 0 }}{{ col.delta }}
+        </span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   C10  CARDINALITY EXPLOSION  — Feature 6
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.c10 %}open{% endif %}>
+  <summary class="sec-hdr">
+    C10 · Cardinality Explosion (New Categories Detected)
+    {% if r.c10 %}
+    <span class="sec-badge badge-red">{{ r.c10 | length }} column{{ 's' if r.c10|length != 1 }}</span>
+    {% else %}
+    <span class="sec-badge badge-green">None detected</span>
+    {% endif %}
+  </summary>
+
+  {% if not r.c10 %}
+  <p class="empty-state">✓ No cardinality explosions — categorical encodings are stable across versions.</p>
+  {% else %}
+  <div class="card-note" style="margin-bottom:1rem;">
+    <strong>Why this matters:</strong> When a categorical column gains new values between versions, it silently breaks
+    one-hot encoders, WoE/IV bins, and label encoders trained on older data.
+    A ≥50% cardinality increase is flagged as critical; ≥20% as notable.
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        <th>Scale</th>
+        {% for lbl in version_labels %}<th>{{ lbl }}<br><small>cardinality</small></th>{% endfor %}
+        <th>Explosion detail</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in r.c10 %}
+    <tr class="row-highlight">
+      <td><code>{{ item.column }}</code></td>
+      <td><span class="tag">{{ item.scale }}</span></td>
+      {% for cv in item.cardinalities %}
+      <td>
+        {% if cv.cardinality is not none %}
+          {{ cv.cardinality }}
+        {% else %}
+          <span class="tag tag-gray">absent</span>
+        {% endif %}
+      </td>
+      {% endfor %}
+      <td>
+        {% for exp in item.explosions %}
+        <span class="drift-badge drift-{{ exp.severity if exp.severity != 'dropped' else 'notable' }}">
+          {% if exp.severity == 'dropped' %}
+            dropped
+          {% else %}
+            {{ exp.from_ver.split('_v')|last }}→{{ exp.to_ver.split('_v')|last }}:
+            {{ exp.from_card }}→{{ exp.to_card }} (×{{ exp.ratio }})
+          {% endif %}
+        </span>
+        {% endfor %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</details>
+
+{% endblock %}

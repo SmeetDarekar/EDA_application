@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% block title %}Analysis — {{ abt.abt_name }}{% endblock %}
+{% block content %}
+
+{# ── breadcrumb ── #}
+<div class="breadcrumb">
+  <a href="{{ url_for('home') }}">Home</a> / <a href="{{ url_for('analyze_select') }}">Analyze</a> / {{ abt.abt_name }}
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   S1  HEALTH SUMMARY
+══════════════════════════════════════════════════════════ #}
+<div class="page-hdr">
+  <div>
+    <h1>{{ abt.abt_name }}</h1>
+    <span class="sub">v{{ abt.version }} · {{ abt.snapshot_date }} · {{ "{:,}".format(abt.row_count) }} rows</span>
+  </div>
+  <span class="health-badge health-{{ r.s1.overall_health }}">{{ r.s1.overall_health | upper }}</span>
+</div>
+
+<div class="metric-grid">
+  <div class="metric-card"><div class="mv">{{ r.s1.total_columns }}</div><div class="ml">Total columns</div></div>
+  <div class="metric-card mc-green"><div class="mv">{{ r.s1.fully_complete }}</div><div class="ml">Fully complete</div></div>
+  <div class="metric-card {% if r.s1.high_missing > 0 %}mc-red{% endif %}">
+    <div class="mv">{{ r.s1.high_missing }}</div><div class="ml">High missing (&lt;50%)</div></div>
+  <div class="metric-card {% if r.s1.privacy_flagged > 0 %}mc-amber{% endif %}">
+    <div class="mv">{{ r.s1.privacy_flagged }}</div><div class="ml">Privacy flagged</div></div>
+  <div class="metric-card {% if r.s1.zero_variance > 0 %}mc-red{% endif %}">
+    <div class="mv">{{ r.s1.zero_variance }}</div><div class="ml">Zero variance</div></div>
+  <div class="metric-card {% if r.s1.has_mismatches > 0 %}mc-amber{% endif %}">
+    <div class="mv">{{ r.s1.has_mismatches }}</div><div class="ml">Have mismatches</div></div>
+</div>
+
+{# ══════════════════════════════════════════════════════════
+   S2  BLOCKERS
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.s2 %}open{% endif %}>
+  <summary class="sec-hdr">
+    <span class="sec-badge badge-red">{{ r.s2 | length }} Blocker{{ 's' if r.s2 | length != 1 }}</span>
+    S2 · Columns Requiring Action Before Modeling
+  </summary>
+  {% if not r.s2 %}
+  <p class="empty-state">✓ No blockers detected.</p>
+  {% else %}
+  {% for item in r.s2 %}
+  <div class="issue-row issue-blocker">
+    <div class="ir-col">
+      <code class="col-name">{{ item.column }}</code>
+      <span class="tag tag-{{ item.data_type }}">{{ item.data_type }}</span>
+      <span class="tag">{{ item.scale }}</span>
+      <span class="tag {% if item.completeness < 50 %}tag-red{% endif %}">{{ item.completeness }}% complete</span>
+    </div>
+    <div class="ir-reasons">
+      {% for r_ in item.reasons %}
+      <div class="reason">
+        <span class="reason-rule">{{ r_.rule | replace('_',' ') | upper }}</span>
+        <span class="reason-detail">{{ r_.detail }}</span>
+        <span class="reason-action">→ {{ r_.action }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   S3  WARNINGS
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.s3 %}open{% endif %}>
+  <summary class="sec-hdr">
+    <span class="sec-badge badge-amber">{{ r.s3 | length }} Warning{{ 's' if r.s3 | length != 1 }}</span>
+    S3 · Data Quality Warnings
+  </summary>
+  {% if not r.s3 %}
+  <p class="empty-state">✓ No warnings detected.</p>
+  {% else %}
+  {% for item in r.s3 %}
+  <div class="issue-row issue-warn">
+    <div class="ir-col">
+      <code class="col-name">{{ item.column }}</code>
+      <span class="tag">{{ item.data_type }}</span>
+      <span class="tag">{{ item.scale }}</span>
+      <span class="tag tag-amber">{{ item.completeness }}% complete</span>
+    </div>
+    <div class="ir-reasons">
+      {% for iss in item.issues %}
+      <div class="reason">
+        <span class="reason-rule">{{ iss.type | replace('_',' ') }}</span>
+        <span class="reason-detail">{{ iss.detail }}</span>
+        <span class="reason-action">→ {{ iss.action }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   S4  GOVERNANCE
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.s4 %}open{% endif %}>
+  <summary class="sec-hdr">
+    <span class="sec-badge badge-blue">{{ r.s4 | length }} Risk{{ 's' if r.s4 | length != 1 }}</span>
+    S4 · Governance, Privacy &amp; Leakage Risks
+  </summary>
+  {% if not r.s4 %}
+  <p class="empty-state">✓ No governance risks detected.</p>
+  {% else %}
+  {% for item in r.s4 %}
+  <div class="issue-row issue-gov">
+    <div class="ir-col">
+      <code class="col-name">{{ item.column }}</code>
+      <span class="tag">{{ item.data_type }}</span>
+      <span class="tag">{{ item.scale }}</span>
+    </div>
+    <div class="ir-reasons">
+      {% for risk in item.risks %}
+      <div class="reason">
+        <span class="reason-rule risk-{{ risk.risk_type }}">{{ risk.risk_type }}</span>
+        <span class="reason-detail">{{ risk.detail }}</span>
+        <span class="reason-action">→ {{ risk.action }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   S5  READINESS TABLE
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" open>
+  <summary class="sec-hdr">
+    S5 · Column Readiness Classification
+    <span class="sec-badge badge-green">{{ r.s5 | selectattr('status','eq','ready') | list | length }} Ready</span>
+    <span class="sec-badge badge-amber">{{ r.s5 | selectattr('status','eq','caution') | list | length }} Caution</span>
+    <span class="sec-badge badge-red">{{ r.s5 | selectattr('status','eq','drop') | list | length }} Drop</span>
+  </summary>
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterTable('all',this)">All</button>
+    <button class="filter-btn" onclick="filterTable('ready',this)">Ready</button>
+    <button class="filter-btn" onclick="filterTable('caution',this)">Caution</button>
+    <button class="filter-btn" onclick="filterTable('drop',this)">Drop</button>
+  </div>
+
+  <table class="data-table" id="readiness-table">
+    <thead><tr><th>Column</th><th>Type</th><th>Scale</th><th>Completeness</th><th>Cardinality</th><th>Status</th><th>Reason</th></tr></thead>
+    <tbody>
+    {% for row in r.s5 %}
+    <tr data-status="{{ row.status }}">
+      <td><code>{{ row.column }}</code></td>
+      <td>{{ row.data_type }}</td>
+      <td>{{ row.scale }}</td>
+      <td>
+        <div class="bar-wrap">
+          <div class="bar-bg"><div class="bar-fill" style="width:{{ row.completeness }}%;background:{% if row.completeness==100 %}#5d9e3a{% elif row.completeness>=50 %}#d97706{% else %}#dc2626{% endif %}"></div></div>
+          <span>{{ row.completeness }}%</span>
+        </div>
+      </td>
+      <td>{{ "{:,}".format(row.cardinality) }}</td>
+      <td><span class="status-badge status-{{ row.status }}">{{ row.status }}</span></td>
+      <td class="reason-text">{{ row.reason }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   S6  TARGET
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" {% if r.s6 %}open{% endif %}>
+  <summary class="sec-hdr">S6 · Target Variable Analysis</summary>
+  {% if not r.s6 %}
+  <p class="empty-state">No target column detected. Use the target_col input on the previous page to specify one.</p>
+  {% elif r.s6.error is defined %}
+  <p class="empty-state warn">{{ r.s6.error }}</p>
+  {% else %}
+  <div class="target-grid">
+    <div class="tg-card"><div class="tg-val">{{ r.s6.event_rate }}%</div><div class="tg-lbl">Event rate (target=1)</div></div>
+    <div class="tg-card"><div class="tg-val">{{ r.s6.non_event_rate }}%</div><div class="tg-lbl">Non-event rate</div></div>
+    <div class="tg-card"><div class="tg-val">{{ r.s6.imbalance_ratio }}:1</div><div class="tg-lbl">Imbalance ratio</div></div>
+    <div class="tg-card tg-{{ r.s6.balance_label }}">
+      <div class="tg-val">{{ r.s6.balance_label | upper }}</div>
+      <div class="tg-lbl">Balance label</div>
+    </div>
+  </div>
+  <div class="rec-list">
+    {% for rec in r.s6.recommendations %}
+    <div class="rec-item">→ {{ rec }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</details>
+
+{# ══════════════════════════════════════════════════════════
+   S7  DISTRIBUTION HEALTH
+══════════════════════════════════════════════════════════ #}
+<details class="section-card">
+  <summary class="sec-hdr">S7 · Distribution Health of Numeric Features</summary>
+  {% if not r.s7 %}
+  <p class="empty-state">No eligible numeric columns found.</p>
+  {% else %}
+  <div class="dist-grid">
+    {% for col in r.s7 %}
+    <div class="dist-card {% if col.has_outliers or col.prob_like %}dist-flag{% endif %}">
+      <div class="dist-name">
+        <code>{{ col.column }}</code>
+        <span class="tag">{{ col.scale }}</span>
+        {% if col.prob_like %}<span class="tag tag-amber">prob-like</span>{% endif %}
+        {% if col.has_outliers %}<span class="tag tag-red">{{ col.n_outliers }} outliers</span>{% endif %}
+      </div>
+      <div class="dist-stats">
+        <span>mean {{ col.mean }}</span>
+        <span>std {{ col.std }}</span>
+        <span>skew <strong class="skew-{{ col.skew_label | replace(' ','-') }}">{{ col.skewness }}</strong></span>
+        <span>range [{{ col.min }}, {{ col.max }}]</span>
+      </div>
+      <div class="dist-iqr">
+        <div class="iqr-bar">
+          <div class="iqr-fill" style="left:0%;width:100%">
+            <span class="iqr-q" style="left:{{ ((col.q25 - col.min) / ((col.max - col.min) or 1) * 100) | round }}%">Q1</span>
+            <span class="iqr-q" style="left:{{ ((col.q50 - col.min) / ((col.max - col.min) or 1) * 100) | round }}%">M</span>
+            <span class="iqr-q" style="left:{{ ((col.q75 - col.min) / ((col.max - col.min) or 1) * 100) | round }}%">Q3</span>
+          </div>
+        </div>
+      </div>
+      <div class="dist-advice">{{ col.transform }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</details>
+
+{% endblock %}
