@@ -31,7 +31,7 @@ def s1_health_summary(abt: ABTProfile) -> Dict:
                           if c.statistical_scale == "unary" or c.cardinality_count <= 1)
     has_mismatches  = sum(1 for c in abt.columns if c.mismatched_count > 0)
     issues = high_missing + zero_variance + has_mismatches
-    health = "healthy" if (issues == 0 and privacy_flagged == 0) else ("caution" if issues <= 2 else "critical")
+    health = "healthy" if (issues == 0 and privacy_flagged == 0) else ("caution" if issues <= 3 else "critical")
     return {
         "abt_name": abt.abt_name, "snapshot_date": abt.snapshot_date,
         "row_count": abt.row_count, "version": abt.version,
@@ -230,6 +230,7 @@ def s8_column_health_scores(abt: ABTProfile) -> Dict[str, Dict]:
     return {col.name: column_health_score(col, row_count) for col in abt.columns}
 
 
+# Not Used yet.
 def s9_action_list(abt: ABTProfile, health_scores: Dict,
                     blockers: list, warnings: list, governance: list) -> List[Dict]:
     """Prioritised action list — ranked by severity × modeling impact."""

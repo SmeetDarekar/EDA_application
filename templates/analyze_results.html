@@ -236,4 +236,37 @@
   {% endif %}
 </details>
 
+{# ══════════════════════════════════════════════════════════
+   CHART: Column Health Score — horizontal bar (Visual 1)
+   Reads from r.s8. Shows worst columns at top. Tooltip shows top_issue.
+══════════════════════════════════════════════════════════ #}
+<details class="section-card" open>
+  <summary class="sec-hdr">Column Health Scores — Visual Overview</summary>
+  <div style="height:{{ [r.s8 | length * 28, 200] | max }}px; padding: .5rem 0;">
+    <canvas id="chart-health-scores"
+      data-scores='{{ r.s8.values() | list | tojson }}'></canvas>
+  </div>
+  <p style="font-size:.75rem;color:var(--text2);margin-top:.5rem;">
+    Sorted worst → best. Hover for top issue. Score = weighted composite of completeness, variance, mismatch, governance, distribution.
+  </p>
+</details>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Re-pass s8 scores with top_issue field for tooltip
+(function() {
+  const canvas = document.getElementById('chart-health-scores');
+  if (!canvas) return;
+  const raw = {{ r.s8 | tojson }};
+  const arr = Object.entries(raw).map(([col, v]) => ({
+    column: col,
+    score: v.score,
+    label: v.label,
+    top_issue: v.top_issue || ''
+  }));
+  canvas.dataset.scores = JSON.stringify(arr);
+})();
+</script>
 {% endblock %}

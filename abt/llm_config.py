@@ -79,7 +79,17 @@ PROVIDERS = {
         },
         "parse": lambda r: (((r.get("choices") or [{}])[0]).get("message") or {}).get("content", ""),
     },
+
+    "gemini": [
+        "api_url": 
+        "api_key": "",
+        
+
+    ]
 }
+
+
+
 
 
 def get_provider() -> dict:
