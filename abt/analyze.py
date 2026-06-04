@@ -30,8 +30,21 @@ def s1_health_summary(abt: ABTProfile) -> Dict:
     zero_variance   = sum(1 for c in abt.columns
                           if c.statistical_scale == "unary" or c.cardinality_count <= 1)
     has_mismatches  = sum(1 for c in abt.columns if c.mismatched_count > 0)
-    issues = high_missing + zero_variance + has_mismatches
-    health = "healthy" if (issues == 0 and privacy_flagged == 0) else ("caution" if issues <= 3 else "critical")
+
+    # Hard blocker count (S2-equivalent: high_missing + zero_variance only —
+    # mismatches at any level are warnings until they cross the 15% blocker threshold)
+    hard_blockers = high_missing + zero_variance
+    blocker_pct   = hard_blockers / max(total, 1)
+
+    # Align with S0: critical when >20% of columns are blocked,
+    # caution when any issues exist, healthy only when clean
+    if hard_blockers == 0 and has_mismatches == 0 and privacy_flagged == 0:
+        health = "healthy"
+    elif blocker_pct > 0.20 or (hard_blockers > 0 and has_mismatches >= 3):
+        health = "critical"
+    else:
+        health = "caution"
+
     return {
         "abt_name": abt.abt_name, "snapshot_date": abt.snapshot_date,
         "row_count": abt.row_count, "version": abt.version,
@@ -243,7 +256,7 @@ def s0_readiness_score(health_scores: Dict, readiness_statuses: List[Dict]) -> D
 
 
 def run_analysis(abt: ABTProfile, target_col: Optional[str] = None,
-                  use_llm: bool = True) -> Dict:
+                  use_llm: bool = True, cfg=None) -> Dict:
     s2 = s2_blockers(abt)
     s3 = s3_warnings(abt)
     s4 = s4_governance(abt)
@@ -261,6 +274,25 @@ def run_analysis(abt: ABTProfile, target_col: Optional[str] = None,
         "s8":  s8,
         "s9":  s9_action_list(abt, s8, s2, s3, s4),
     }
+    # ── Interpretation layer (i1–i3) ────────────────────────────────────────
+    try:
+        from .interpretations import (
+            i1_feature_verdicts,
+            i2_training_readiness,
+            i3_preprocessing_checklist,
+        )
+        i1 = i1_feature_verdicts(
+            results["s2"], results["s3"], results["s4"],
+            results["s7"], results["s8"], abt.row_count
+        )
+        i2 = i2_training_readiness(results["s6"], results["s2"], results["s1"], results["s0"])
+        i3 = i3_preprocessing_checklist(results["s3"], results["s5"], results["s7"], i1)
+        results["i1"] = i1
+        results["i2"] = i2
+        results["i3"] = i3
+    except Exception:
+        pass  # interpretation layer is always optional, never breaks existing results
+
     if use_llm:
         try:
             from .llm_insights import enrich_analyze

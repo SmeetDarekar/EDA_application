@@ -2,11 +2,29 @@
 {% block title %}Compare — Select{% endblock %}
 {% block content %}
 <div class="page-hdr">
-  <h1>Compare ABT Versions</h1>
-  <p>Select a table and then choose which versions to compare.</p>
+  <div>
+    <h1>Compare ABT Versions</h1>
+    <p>Select a table and then choose which versions to compare.</p>
+  </div>
+  <a href="{{ url_for('config_page', return_to='compare') }}" class="btn-config">
+    ⚙ Additional Configuration
+    {% if not cfg_is_default %}
+    <span class="cfg-dot" title="Custom thresholds active"></span>
+    {% endif %}
+  </a>
 </div>
 
 {% if error %}<div class="alert alert-err">{{ error }}</div>{% endif %}
+
+{% if not cfg_is_default %}
+<div class="cfg-active-strip">
+  <span class="cas-icon">⚙</span>
+  <span>Custom thresholds are active —
+    <a href="{{ url_for('config_page', return_to='compare') }}">review them</a>
+    or <a href="{{ url_for('config_reset', return_to='compare') }}">reset to defaults</a>.
+  </span>
+</div>
+{% endif %}
 
 <div class="form-card">
   {# Step 1: choose table #}
@@ -30,6 +48,10 @@
   {% if versions %}
   <form method="POST" action="{{ url_for('compare_run') }}" style="margin-top:1.5rem">
     <input type="hidden" name="table_name" value="{{ selected_table }}">
+
+    {# Pass all current threshold values as hidden fields #}
+    {{ cfg_hidden | safe }}
+
     <div class="form-group">
       <label>Select Versions to Compare <span class="req">*</span>
         <span class="optional">(hold Ctrl/Cmd for multi-select)</span></label>
@@ -53,4 +75,47 @@
   </form>
   {% endif %}
 </div>
+
+<style>
+.btn-config {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: 6px;
+  padding: .5rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+  align-self: center;
+}
+.btn-config:hover { border-color: var(--blue); color: var(--text); }
+.cfg-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.cfg-active-strip {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background: rgba(245,158,11,.06);
+  border: 1px solid rgba(245,158,11,.2);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  padding: .6rem 1rem;
+  font-size: .82rem;
+  color: var(--text2);
+  margin-bottom: 1rem;
+}
+.cfg-active-strip a { color: var(--blue); }
+.cas-icon { font-size: .95rem; }
+</style>
 {% endblock %}

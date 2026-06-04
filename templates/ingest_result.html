@@ -32,17 +32,18 @@
       <span class="pill">Table: {{ table_name }}</span>
       <span class="pill">Version: {{ result.version }}</span>
       <span class="pill mono">Hash: {{ result.hash[:12] }}…</span>
+      {% if source %}<span class="pill">Source: {{ source }}</span>{% endif %}
+      {% if column_count %}<span class="pill">{{ column_count }} columns</span>{% endif %}
     </div>
   </div>
 </div>
 
 <div class="form-actions" style="margin-top:1.5rem;">
-  <a href="{{ url_for('analyze_run') }}" class="btn-primary"
-    onclick="this.closest('div').insertAdjacentHTML('beforebegin',
-      '<form id=af method=POST action=\'{{ url_for(\'analyze_run\') }}\'><input name=table_name value=\'{{ table_name }}\'><input name=version value=\'{{ result.version }}\'></form>');
-      document.getElementById('af').submit(); return false;">
-    Analyze this version →
-  </a>
+  <form method="POST" action="{{ url_for('analyze_run') }}" style="display:inline">
+    <input type="hidden" name="table_name" value="{{ table_name }}">
+    <input type="hidden" name="version" value="{{ result.version }}">
+    <button type="submit" class="btn-primary">Analyze this version →</button>
+  </form>
   <a href="{{ url_for('ingest_page') }}" class="btn-sec">Ingest another</a>
   <a href="{{ url_for('home') }}" class="btn-sec">Home</a>
 </div>

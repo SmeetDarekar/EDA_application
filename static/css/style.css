@@ -333,3 +333,277 @@ canvas { display: block; width: 100% !important; }
 .fill-green { background: #22c55e; }
 .fill-amber { background: #d97706; }
 .fill-red   { background: #dc2626; }
+
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   THRESHOLD CONFIGURATION PAGE  — append to style.css
+   All rules are namespaced under .cfg-* to avoid collisions.
+══════════════════════════════════════════════════════════════════════ */
+
+/* ── Config page info banner ──────────────────────────────────────── */
+.cfg-info-banner {
+  display: flex;
+  gap: .875rem;
+  align-items: flex-start;
+  background: rgba(59,130,246,.06);
+  border: 1px solid rgba(59,130,246,.2);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: .875rem 1.1rem;
+  margin-bottom: 1.5rem;
+  font-size: .85rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.cfg-info-custom {
+  background: rgba(245,158,11,.05);
+  border-color: rgba(245,158,11,.25);
+  border-left-color: var(--amber);
+  color: var(--text);
+}
+.cib-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+
+/* ── "Custom thresholds active" badge (page header) ──────────────── */
+.cfg-active-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .3rem .8rem;
+  border-radius: 99px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* ── Config sections container ────────────────────────────────────── */
+.cfg-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.cfg-section-hdr {
+  padding: .875rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+  background: var(--bg3);
+}
+.cfg-section-hdr h2 {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.cfg-section-note {
+  font-size: .75rem;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* ── Field grid ───────────────────────────────────────────────────── */
+.cfg-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 0;
+}
+.cfg-field {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  transition: background .15s;
+}
+.cfg-field:hover { background: rgba(255,255,255,.015); }
+.cfg-field-changed {
+  background: rgba(245,158,11,.04);
+  border-left: 2px solid var(--amber);
+}
+.cfg-field-changed:hover { background: rgba(245,158,11,.07); }
+
+.cfg-field-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: .5rem;
+  gap: .5rem;
+}
+.cfg-field-top label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  cursor: default;
+}
+.changed-dot {
+  color: var(--amber);
+  font-size: .55rem;
+  vertical-align: super;
+  margin-left: .25rem;
+}
+.cfg-field-controls {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+.cfg-default-val {
+  font-size: .68rem;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.btn-reset-field {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: 4px;
+  padding: .1rem .35rem;
+  font-size: .75rem;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: .15s;
+}
+.btn-reset-field:hover { color: var(--text); border-color: var(--text3); }
+
+/* ── Input row: range slider + number box ─────────────────────────── */
+.cfg-input-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .4rem;
+}
+.cfg-range {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+.cfg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  border: 2px solid var(--bg2);
+  box-shadow: 0 0 0 1px var(--blue);
+  transition: transform .1s;
+}
+.cfg-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.cfg-number {
+  width: 80px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: .35rem .5rem;
+  font-size: .8rem;
+  font-family: var(--font-mono);
+  text-align: right;
+  transition: border-color .15s;
+  flex-shrink: 0;
+}
+.cfg-number:focus { outline: none; border-color: var(--blue); }
+
+.cfg-hint {
+  font-size: .73rem;
+  color: var(--text3);
+  line-height: 1.55;
+}
+
+/* ── Weight sum display ───────────────────────────────────────────── */
+.weight-sum-ok  { color: var(--green); font-family: var(--font-mono); font-weight: 600; }
+.weight-sum-bad { color: var(--red);   font-family: var(--font-mono); font-weight: 600; }
+
+/* ── Config page actions ──────────────────────────────────────────── */
+.cfg-actions {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+/* ── "Additional Configuration" button (on select pages) ─────────── */
+.btn-config {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  border-radius: 6px;
+  padding: .5rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .15s, color .15s;
+  white-space: nowrap;
+  align-self: center;
+}
+.btn-config:hover { border-color: var(--blue); color: var(--text); }
+
+/* ── Amber dot indicator when custom config is active ─────────────── */
+.cfg-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── Active threshold strip (shown below page header) ─────────────── */
+.cfg-active-strip {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background: rgba(245,158,11,.06);
+  border: 1px solid rgba(245,158,11,.2);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--radius);
+  padding: .6rem 1rem;
+  font-size: .82rem;
+  color: var(--text2);
+  margin-bottom: 1rem;
+}
+.cfg-active-strip a { color: var(--blue); text-decoration: none; }
+.cfg-active-strip a:hover { text-decoration: underline; }
+.cas-icon { font-size: .95rem; }
+
+/* ── Config summary chip on results pages ─────────────────────────── */
+.cfg-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .25rem .65rem;
+  border-radius: 99px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  text-decoration: none;
+  transition: opacity .15s;
+}
+.cfg-summary-chip:hover { opacity: .8; }
+.cfg-summary-chip.cfg-default {
+  background: var(--bg3);
+  color: var(--text3);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cfg-fields { grid-template-columns: 1fr; }
+  .cfg-number { width: 70px; }
+  .btn-config { font-size: .75rem; padding: .4rem .75rem; }
+}

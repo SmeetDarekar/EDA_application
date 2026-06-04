@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Fetch from Information Catalog{% endblock %}
+{% block content %}
+
+<div class="page-hdr">
+  <h1>Fetch from Information Catalog</h1>
+  <p>Pull column metadata directly from IC. Versioning is handled automatically — same as manual ingest.</p>
+</div>
+
+{% if error %}
+<div class="alert alert-err">{{ error }}</div>
+{% endif %}
+
+<div class="form-card">
+
+  <div class="ic-info-banner">
+    <div class="ic-icon">⬇</div>
+    <div>
+      <strong>How this works</strong><br>
+      <span>We fetch column metadata from IC using the table name you provide.
+      If this table has been fetched before and the metadata hasn't changed,
+      no new version is created — the existing version's timestamp is updated.
+      If the metadata has changed, a new version is stored automatically.</span>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('fetch_ic_submit') }}">
+    <div class="form-row two-col">
+      <div class="form-group">
+        <label for="table_name">Table Name <span class="req">*</span></label>
+        <input type="text" id="table_name" name="table_name"
+               placeholder="e.g. MODEL_ADD_DATASET" required
+               value="{{ request.form.get('table_name', '') }}">
+        <span class="hint">The CAS table name as it appears in IC.</span>
+      </div>
+      <div class="form-group">
+        <label for="caslib">Library (CASLib) <span class="optional">(optional)</span></label>
+        <input type="text" id="caslib" name="caslib"
+               placeholder="e.g. PUBLIC"
+               value="{{ request.form.get('caslib', '') }}">
+        <span class="hint">Narrows the search to a specific CAS library. Leave blank to search all.</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">Fetch from IC →</button>
+      <a href="{{ url_for('ingest_page') }}" class="btn-sec">Manual Ingest instead</a>
+      <a href="{{ url_for('api_ic_test') }}" target="_blank" class="btn-sec">Test IC connection ↗</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.ic-info-banner {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-left: 3px solid #3b82f6;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: .85rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.ic-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  margin-top: .1rem;
+}
+</style>
+{% endblock %}

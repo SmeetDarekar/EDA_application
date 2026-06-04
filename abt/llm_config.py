@@ -16,7 +16,7 @@ Each provider entry needs:
 import os
 
 # ── Switch provider here ──────────────────────────────────────────────────────
-ACTIVE_PROVIDER = "openai"   # options: "anthropic" | "openai" | "azure_openai"
+ACTIVE_PROVIDER = "azure_openai"   # options: "anthropic" | "openai" | "azure_openai"
 
 # ── Timeout for LLM calls (seconds) ──────────────────────────────────────────
 LLM_TIMEOUT = 30
@@ -63,9 +63,12 @@ PROVIDERS = {
 
     "azure_openai": {
         # Set AZURE_OPENAI_ENDPOINT as full URL incl. deployment name
-        "api_url":  os.environ.get("AZURE_OPENAI_ENDPOINT", ""),
-        "api_key":  os.environ.get("AZURE_OPENAI_KEY", ""),
-        "model":    os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
+        # "api_url":  os.environ.get("AZURE_OPENAI_ENDPOINT", ""),
+        # "api_key":  os.environ.get("AZURE_OPENAI_KEY", ""),
+        # "model":    os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
+        "api_url":  "https://rm-vpn.cognitiveservices.azure.com/%22",
+        "api_key":  "", 
+        "model":    "gpt-4.1",
         "headers":  lambda key: {
             "Content-Type": "application/json",
             "api-key":      key,
@@ -80,12 +83,6 @@ PROVIDERS = {
         "parse": lambda r: (((r.get("choices") or [{}])[0]).get("message") or {}).get("content", ""),
     },
 
-    "gemini": [
-        "api_url": 
-        "api_key": "",
-        
-
-    ]
 }
 
 

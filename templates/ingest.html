@@ -2,8 +2,13 @@
 {% block title %}Ingest Metadata{% endblock %}
 {% block content %}
 <div class="page-hdr">
-  <h1>Ingest Table Metadata</h1>
-  <p>Paste the raw metadata JSON for any table. Versioning is handled automatically.</p>
+  <div>
+    <h1>Ingest Table Metadata</h1>
+    <p>Paste the raw metadata JSON for any table. Versioning is handled automatically.</p>
+  </div>
+  <a href="{{ url_for('fetch_ic_page') }}" class="btn-primary" style="white-space:nowrap;">
+    ⬇ Fetch from IC
+  </a>
 </div>
 
 {% if error %}<div class="alert alert-err">{{ error }}</div>{% endif %}

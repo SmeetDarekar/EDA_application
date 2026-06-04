@@ -1,0 +1,2246 @@
+{
+  "abt_snapshot": {
+    "name": "BACKTESTING_DATA_v1",
+    "table_name": "BACKTESTING_DATA",
+    "version": 1,
+    "row_count": 24,
+    "snapshot_date": "2026-05-22"
+  },
+  "items": [
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "8876422d-e655-fc42-9396-598c7c51c94e",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "uri": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "uri": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "uri": "/catalog/updates/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "uri": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e",
+          "uri": "/catalog/instances/8876422d-e655-fc42-9396-598c7c51c94e"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "account_rk",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 1000,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": true,
+        "kurtosis": -1.2,
+        "leastCommonValue": 1,
+        "max": 1000,
+        "mean": 500.5,
+        "median": 500.5,
+        "min": 1,
+        "missingCount": 0,
+        "mode": 1000,
+        "mostCommonValue": 1000,
+        "nOutliers": 0,
+        "ordinalPosition": 12,
+        "quantiles25": 250.5,
+        "quantiles50": 500.5,
+        "quantiles75": 750.5,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "semanticTypeId": "GENERIC_ID",
+        "semanticTypeScore": 201,
+        "skewness": -6.20361e-19,
+        "standardDeviation": 288.8194361,
+        "statisticalScale": "id",
+        "uniquenessPercent": 100
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "a3534025-e117-c44e-91ac-7b232afa09b5",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "uri": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "uri": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "uri": "/catalog/updates/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "uri": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5",
+          "uri": "/catalog/instances/a3534025-e117-c44e-91ac-7b232afa09b5"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "actual_default",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "cardinalityCount": 2,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": true,
+        "hasUniqueField": false,
+        "kurtosis": 1.4918114462,
+        "leastCommonValue": 1,
+        "max": 1,
+        "mean": 0.159,
+        "median": 0,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0,
+        "mostCommonValue": 0,
+        "nOutliers": 159,
+        "ordinalPosition": 19,
+        "quantiles25": 0,
+        "quantiles50": 0,
+        "quantiles75": 0,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 1.8678414872,
+        "standardDeviation": 0.3658590615,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "df0d25ad-63da-b542-917b-2383ccb2e12f",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "uri": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "uri": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "uri": "/catalog/updates/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "uri": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f",
+          "uri": "/catalog/instances/df0d25ad-63da-b542-917b-2383ccb2e12f"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "age",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 42,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "informationPrivacy": "private",
+        "kurtosis": -1.159408515,
+        "leastCommonValue": 18,
+        "max": 59,
+        "mean": 39.285,
+        "median": 40,
+        "min": 18,
+        "missingCount": 0,
+        "mode": 55,
+        "mostCommonValue": 55,
+        "nOutliers": 0,
+        "ordinalPosition": 13,
+        "quantiles25": 29,
+        "quantiles50": 40,
+        "quantiles75": 49,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "semanticTypeId": "AGE",
+        "semanticTypeScore": 201,
+        "skewness": -0.077108831,
+        "standardDeviation": 11.943383918,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 4.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "de61ea8c-15d0-0345-9a46-48b885d97c3c",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "uri": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "uri": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "uri": "/catalog/updates/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "uri": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c",
+          "uri": "/catalog/instances/de61ea8c-15d0-0345-9a46-48b885d97c3c"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "bin_var1",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "cardinalityCount": 2,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -2.002403364,
+        "leastCommonValue": 0,
+        "max": 1,
+        "mean": 0.51,
+        "median": 1,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 1,
+        "mostCommonValue": 1,
+        "nOutliers": 0,
+        "ordinalPosition": 18,
+        "quantiles25": 0,
+        "quantiles50": 1,
+        "quantiles75": 1,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": -0.04006813,
+        "standardDeviation": 0.5001501276,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "uri": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "uri": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "uri": "/catalog/updates/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "uri": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556",
+          "uri": "/catalog/instances/da3b634c-c3a8-754c-93f6-f6f80ebe4556"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "bin_var2",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "Boolean",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 2,
+        "casDataType": "char",
+        "charsMaxCount": 3,
+        "charsMinCount": 2,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "No",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "Yes",
+        "mostCommonValue": "Yes",
+        "ordinalPosition": 2,
+        "rawLength": 3,
+        "sasDataType": "char",
+        "semanticTypeScore": 200,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "2f249575-4009-5a4b-ae07-f602c78cafeb",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "uri": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "uri": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "uri": "/catalog/updates/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "uri": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb",
+          "uri": "/catalog/instances/2f249575-4009-5a4b-ae07-f602c78cafeb"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "category",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 3,
+        "casDataType": "char",
+        "charsMaxCount": 1,
+        "charsMinCount": 1,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "A",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "B",
+        "mostCommonValue": "B",
+        "ordinalPosition": 1,
+        "rawLength": 10,
+        "sasDataType": "char",
+        "semanticTypeScore": 200,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.3
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "7a85d35b-e242-d649-9a1c-c8fbef440144",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "uri": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "uri": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "uri": "/catalog/updates/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "uri": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144",
+          "uri": "/catalog/instances/7a85d35b-e242-d649-9a1c-c8fbef440144"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "expected_loss",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 989,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": true,
+        "hasUniqueField": true,
+        "kurtosis": 2.3710874612,
+        "leastCommonValue": 50.1,
+        "max": 502011.86,
+        "mean": 77293.33392,
+        "median": 47971.63,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0,
+        "mostCommonValue": 0,
+        "nOutliers": 47,
+        "ordinalPosition": 24,
+        "quantiles25": 15484.78,
+        "quantiles50": 47971.63,
+        "quantiles75": 113377.08,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 1.5617871918,
+        "standardDeviation": 82983.756821,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 98.9
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "uri": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "uri": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "uri": "/catalog/updates/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "uri": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551",
+          "uri": "/catalog/instances/5f6b07d1-0c6d-f847-a45c-d5e3b12fb551"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "exposure_amt",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 909,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -1.16380953,
+        "leastCommonValue": 50800,
+        "max": 549700,
+        "mean": 305486.1,
+        "median": 308150,
+        "min": 50400,
+        "missingCount": 0,
+        "mode": 468600,
+        "mostCommonValue": 468600,
+        "nOutliers": 0,
+        "ordinalPosition": 22,
+        "quantiles25": 185700,
+        "quantiles50": 308150,
+        "quantiles75": 429400,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": -0.047996344,
+        "standardDeviation": 143443.15004,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 90.9
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "50796d38-afe7-7848-aa19-9af2abb627d3",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "uri": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "uri": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "uri": "/catalog/updates/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "uri": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3",
+          "uri": "/catalog/instances/50796d38-afe7-7848-aa19-9af2abb627d3"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "income",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 89,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": true,
+        "hasUniqueField": false,
+        "kurtosis": 130.37380761,
+        "leastCommonValue": 435000,
+        "max": 1215000,
+        "mean": 67804,
+        "median": 62000,
+        "min": 20000,
+        "missingCount": 0,
+        "mode": 72000,
+        "mostCommonValue": 72000,
+        "nOutliers": 9,
+        "ordinalPosition": 14,
+        "quantiles25": 42000,
+        "quantiles50": 62000,
+        "quantiles75": 80000,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 10.730998307,
+        "standardDeviation": 83020.201987,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 8.9
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "uri": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "uri": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "uri": "/catalog/updates/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "uri": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5",
+          "uri": "/catalog/instances/c51515a5-1f8f-e54a-b894-9ec2bcef55f5"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "lgd",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 101,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -1.187329627,
+        "leastCommonValue": 0.51,
+        "max": 1,
+        "mean": 0.50007,
+        "median": 0.5,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0.96,
+        "mostCommonValue": 0.96,
+        "nOutliers": 0,
+        "ordinalPosition": 23,
+        "quantiles25": 0.25,
+        "quantiles50": 0.5,
+        "quantiles75": 0.74,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": -0.007764128,
+        "standardDeviation": 0.2901870149,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 10.1
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "2cccba0a-e531-c845-9569-456ad42fbc4a",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "uri": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "uri": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "uri": "/catalog/updates/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "uri": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a",
+          "uri": "/catalog/instances/2cccba0a-e531-c845-9569-456ad42fbc4a"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "model_version",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "cardinalityCount": 0,
+        "casDataType": "char",
+        "completenessPercent": 0,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "missingCount": 1000,
+        "ordinalPosition": 8,
+        "rawLength": 12,
+        "sasDataType": "char",
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "6709b65b-ca40-754c-9c52-01db20e5a0ef",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "uri": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "uri": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "uri": "/catalog/updates/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "uri": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef",
+          "uri": "/catalog/instances/6709b65b-ca40-754c-9c52-01db20e5a0ef"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "p_output",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 101,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -1.175006725,
+        "leastCommonValue": 1,
+        "max": 1,
+        "mean": 0.50411,
+        "median": 0.51,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0.89,
+        "mostCommonValue": 0.89,
+        "nOutliers": 0,
+        "ordinalPosition": 17,
+        "quantiles25": 0.26,
+        "quantiles50": 0.51,
+        "quantiles75": 0.75,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": -0.038860634,
+        "standardDeviation": 0.2870738917,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 10.1
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "18b54165-9b56-924b-b1a5-3ec2bebced5d",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "uri": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "uri": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "uri": "/catalog/updates/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "uri": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d",
+          "uri": "/catalog/instances/18b54165-9b56-924b-b1a5-3ec2bebced5d"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "portfolio_type",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 3,
+        "casDataType": "char",
+        "charsMaxCount": 9,
+        "charsMinCount": 3,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "Retail",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "SME",
+        "mostCommonValue": "SME",
+        "ordinalPosition": 9,
+        "rawLength": 15,
+        "sasDataType": "char",
+        "semanticTypeId": "GENERIC_ID",
+        "semanticTypeScore": 201,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.3
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "uri": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "uri": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "uri": "/catalog/updates/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "uri": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e",
+          "uri": "/catalog/instances/d10b3501-ed03-0f4d-a8db-f9ee01508a1e"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "predicted_class",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "cardinalityCount": 2,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -2.002065379,
+        "leastCommonValue": 0,
+        "max": 1,
+        "mean": 0.511,
+        "median": 1,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 1,
+        "mostCommonValue": 1,
+        "nOutliers": 0,
+        "ordinalPosition": 20,
+        "quantiles25": 0,
+        "quantiles50": 1,
+        "quantiles75": 1,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": -0.044076795,
+        "standardDeviation": 0.5001291125,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "uri": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "uri": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "uri": "/catalog/updates/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "uri": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5",
+          "uri": "/catalog/instances/31cb6c88-b6ac-ff4d-a47e-e446e062fbc5"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "prediction_error",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 101,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -1.176674249,
+        "leastCommonValue": 0.01,
+        "max": 1,
+        "mean": 0.49923,
+        "median": 0.49,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0.28,
+        "mostCommonValue": 0.28,
+        "nOutliers": 0,
+        "ordinalPosition": 21,
+        "quantiles25": 0.25,
+        "quantiles50": 0.49,
+        "quantiles75": 0.74,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 0.0091507535,
+        "standardDeviation": 0.2871023073,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 10.1
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "uri": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "uri": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "uri": "/catalog/updates/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "uri": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686",
+          "uri": "/catalog/instances/f7e1e648-9c57-724f-a3ba-c73d8b4d0686"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "risk_band",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 3,
+        "casDataType": "char",
+        "charsMaxCount": 6,
+        "charsMinCount": 3,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "LOW",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "MEDIUM",
+        "mostCommonValue": "MEDIUM",
+        "ordinalPosition": 10,
+        "rawLength": 10,
+        "sasDataType": "char",
+        "semanticTypeScore": 142.4,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.3
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "b4367617-8934-0246-ad7c-d2b9584821a2",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "uri": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "uri": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "uri": "/catalog/updates/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "uri": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2",
+          "uri": "/catalog/instances/b4367617-8934-0246-ad7c-d2b9584821a2"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "score",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "box",
+        "cardinalityCount": 645,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": true,
+        "hasUniqueField": false,
+        "kurtosis": 139.84284762,
+        "leastCommonValue": 0,
+        "max": 999,
+        "mean": 54.9732,
+        "median": 50.15,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 999,
+        "mostCommonValue": 999,
+        "nOutliers": 5,
+        "ordinalPosition": 15,
+        "quantiles25": 25.45,
+        "quantiles50": 50.15,
+        "quantiles75": 75.7,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 10.928901559,
+        "standardDeviation": 72.744779089,
+        "statisticalScale": "interval",
+        "uniquenessPercent": 64.5
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "4689d946-b3bf-6444-b814-7d1e1531dfd6",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "uri": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "uri": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "uri": "/catalog/updates/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "uri": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6",
+          "uri": "/catalog/instances/4689d946-b3bf-6444-b814-7d1e1531dfd6"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "segment",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 3,
+        "casDataType": "char",
+        "charsMaxCount": 6,
+        "charsMinCount": 5,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "Young",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "Senior",
+        "mostCommonValue": "Senior",
+        "ordinalPosition": 11,
+        "rawLength": 12,
+        "sasDataType": "char",
+        "semanticTypeScore": 88.084,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.3
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "215a453d-d3c9-6847-a8eb-47fea0fd017d",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "uri": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "uri": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "uri": "/catalog/updates/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "uri": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d",
+          "uri": "/catalog/instances/215a453d-d3c9-6847-a8eb-47fea0fd017d"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "small_group",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 6,
+        "casDataType": "char",
+        "charsMaxCount": 5,
+        "charsMinCount": 5,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "Grp_F",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "Grp_E",
+        "mostCommonValue": "Grp_E",
+        "ordinalPosition": 6,
+        "rawLength": 10,
+        "sasDataType": "char",
+        "semanticTypeScore": 200,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.6
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "uri": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "uri": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "uri": "/catalog/updates/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "uri": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8",
+          "uri": "/catalog/instances/96f7bc2c-6658-1f4e-84ae-5d61561f03b8"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "target",
+      "type": "casColumn",
+      "attributes": {
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "cardinalityCount": 2,
+        "casDataType": "double",
+        "completenessPercent": 100,
+        "dataType": "num",
+        "hasOutliers": false,
+        "hasUniqueField": false,
+        "kurtosis": -1.191685863,
+        "leastCommonValue": 1,
+        "max": 1,
+        "mean": 0.295,
+        "median": 0,
+        "min": 0,
+        "missingCount": 0,
+        "mode": 0,
+        "mostCommonValue": 0,
+        "nOutliers": 0,
+        "ordinalPosition": 16,
+        "quantiles25": 0,
+        "quantiles50": 0,
+        "quantiles75": 1,
+        "rawLength": 8,
+        "sasDataType": "num",
+        "skewness": 0.9003896478,
+        "standardDeviation": 0.4562709537,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "uri": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "uri": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "uri": "/catalog/updates/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "uri": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499",
+          "uri": "/catalog/instances/0b10c4cf-6777-6240-a3b7-d2ab8442a499"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "three_class",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 3,
+        "casDataType": "char",
+        "charsMaxCount": 1,
+        "charsMinCount": 1,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "X",
+        "mismatchedCount": 152,
+        "missingCount": 0,
+        "mode": "Y",
+        "mostCommonValue": "Y",
+        "ordinalPosition": 4,
+        "rawLength": 5,
+        "sasDataType": "char",
+        "semanticTypeScore": 200,
+        "statisticalScale": "nominal",
+        "uniquenessPercent": 0.3
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "16f7b4d9-a666-d84a-b073-11c27aceec5c",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "uri": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "uri": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "uri": "/catalog/updates/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "uri": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c",
+          "uri": "/catalog/instances/16f7b4d9-a666-d84a-b073-11c27aceec5c"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "two_class_blank",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 2,
+        "casDataType": "char",
+        "charsMaxCount": 1,
+        "charsMinCount": 1,
+        "completenessPercent": 50,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "A",
+        "mismatchedCount": 0,
+        "missingCount": 500,
+        "mode": "B",
+        "mostCommonValue": "B",
+        "ordinalPosition": 5,
+        "rawLength": 5,
+        "sasDataType": "char",
+        "semanticTypeScore": 98.8,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "uri": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "uri": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "uri": "/catalog/updates/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "uri": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77",
+          "uri": "/catalog/instances/e28f0459-f1a5-9943-bad5-a2fffbba6f77"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "two_val_limited",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 2,
+        "casDataType": "char",
+        "charsMaxCount": 4,
+        "charsMinCount": 4,
+        "completenessPercent": 32,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "Val1",
+        "mismatchedCount": 0,
+        "missingCount": 680,
+        "mode": "Val2",
+        "mostCommonValue": "Val2",
+        "ordinalPosition": 7,
+        "rawLength": 10,
+        "sasDataType": "char",
+        "semanticTypeScore": 63.2,
+        "statisticalScale": "binary",
+        "uniquenessPercent": 0.2
+      }
+    },
+    {
+      "creationTimeStamp": "2026-05-11T10:01:30.959Z",
+      "createdBy": "sasadm",
+      "modifiedTimeStamp": "2026-05-11T10:01:30.959Z",
+      "modifiedBy": "sasadm",
+      "id": "4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+      "links": [
+        {
+          "method": "GET",
+          "rel": "self",
+          "href": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "uri": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "type": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "GET",
+          "rel": "alternate",
+          "href": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "uri": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "type": "application/vnd.sas.summary"
+        },
+        {
+          "method": "GET",
+          "rel": "up",
+          "href": "/catalog/instances",
+          "uri": "/catalog/instances",
+          "type": "application/vnd.sas.collection",
+          "itemType": "application/vnd.sas.metadata.instance"
+        },
+        {
+          "method": "PATCH",
+          "rel": "patch",
+          "href": "/catalog/updates/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "uri": "/catalog/updates/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "type": "application/json-patch",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "PUT",
+          "rel": "update",
+          "href": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "uri": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "type": "application/vnd.sas.metadata.instance.entity",
+          "responseType": "application/vnd.sas.metadata.instance.entity"
+        },
+        {
+          "method": "DELETE",
+          "rel": "delete",
+          "href": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04",
+          "uri": "/catalog/instances/4da3d6f7-f11b-db46-a9d5-4e89d632db04"
+        },
+        {
+          "method": "GET",
+          "rel": "definition",
+          "href": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "uri": "/catalog/definitions/87d48d12-53c0-473c-ab34-531817319e79",
+          "type": "application/vnd.sas.metadata.definition.entity"
+        }
+      ],
+      "version": 1,
+      "instanceType": "entity",
+      "definition": "casColumn",
+      "definitionId": "87d48d12-53c0-473c-ab34-531817319e79",
+      "name": "unary_var",
+      "type": "casColumn",
+      "attributes": {
+        "actualDataType": "String",
+        "analysisTimeStamp": "2026-05-11T10:01:28.313Z",
+        "bestChartType": "frequency",
+        "blankValueCount": 0,
+        "cardinalityCount": 1,
+        "casDataType": "char",
+        "charsMaxCount": 5,
+        "charsMinCount": 5,
+        "completenessPercent": 100,
+        "dataType": "char",
+        "hasUniqueField": false,
+        "leastCommonValue": "Only1",
+        "mismatchedCount": 0,
+        "missingCount": 0,
+        "mode": "Only1",
+        "mostCommonValue": "Only1",
+        "ordinalPosition": 3,
+        "rawLength": 6,
+        "sasDataType": "char",
+        "semanticTypeScore": 200,
+        "statisticalScale": "unary",
+        "uniquenessPercent": 0.1
+      }
+    }
+  ]
+}

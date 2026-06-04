@@ -7,6 +7,21 @@
   / {{ version_labels | join(' → ') }}
 </div>
 
+
+{# ── Paste this block directly after the <div class="breadcrumb"> block ── #}
+{# Shows a chip on the results page when custom thresholds were used.        #}
+
+{% if not cfg_is_default %}
+<div class="cfg-active-strip" style="margin-bottom:.75rem;">
+  <span class="cas-icon">⚙</span>
+  <span>
+    This comparison used <strong>custom thresholds</strong>.
+    <a href="{{ url_for('config_page', return_to='compare') }}">Review configuration</a>
+    or <a href="{{ url_for('config_reset', return_to='compare') }}">reset to defaults</a>.
+  </span>
+</div>
+{% endif %}
+
 {# ══════════════════════════════════════════════════════════
    VERSION STRIP + METRIC CARDS  (C1)
 ══════════════════════════════════════════════════════════ #}
@@ -554,5 +569,838 @@
   </table>
   {% endif %}
 </details>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{# ══════════════════════════════════════════════════════════
+   C11  ADVANCED DRIFT SUITE (drift_metrics.py)
+   C11a: Baseline Drift  | C11b: FSI + Velocity | C11c: Per-metric detail
+   All additive — existing sections unchanged above.
+══════════════════════════════════════════════════════════ #}
+{% if r.drift_suite and r.drift_suite.consecutive %}
+{% set ds = r.drift_suite %}
+
+{# ── C11a: Baseline Drift ─────────────────────────────── #}
+<details class="section-card">
+  <summary class="sec-hdr">
+    C11a · Baseline Drift (All Versions vs V1)
+    {% if ds.baseline and ds.baseline.applicable %}
+      {% set shift_count = namespace(n=0) %}
+      {% for col_name, col_data in ds.baseline.columns.items() %}
+        {% if col_data.worst_label == 'shift' %}{% set shift_count.n = shift_count.n + 1 %}{% endif %}
+      {% endfor %}
+      {% if shift_count.n > 0 %}<span class="sec-badge badge-red">{{ shift_count.n }} shift</span>{% endif %}
+    {% endif %}
+  </summary>
+  <div class="narrative-card" style="margin-bottom:1rem;">
+    <div class="nc-label">Why baseline drift matters</div>
+    <div class="nc-text">
+      Consecutive drift (Vn→Vn+1) is an operational signal — it tells you what changed recently.
+      Baseline drift (Vn vs V1) is the model degradation signal — it tells you how far the current
+      population has moved from the data the model was trained on.
+      A feature can look stable version-to-version while being far from the training baseline.
+    </div>
+  </div>
+  {% if ds.baseline and ds.baseline.applicable %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Column</th>
+        {% for cmp in ds.baseline.columns.values()|first %}
+        <th>{{ cmp.version }} vs {{ ds.baseline.baseline }}</th>
+        {% endfor %}
+        <th>Worst</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for col_name, col_data in ds.baseline.columns.items() %}
+    <tr {% if col_data.worst_label == 'shift' %}class="row-highlight"{% endif %}>
+      <td><code>{{ col_name }}</code></td>
+      {% for cmp in col_data.comparisons %}
+      <td>
+        {% if cmp.applicable and cmp.psi is not none %}
+          <span class="drift-badge drift-{{ cmp.label }}">{{ cmp.psi }}</span>
+        {% else %}
+          <span class="tag tag-gray">{{ cmp.label }}</span>
+        {% endif %}
+      </td>
+      {% endfor %}
+      <td><span class="drift-badge drift-{{ col_data.worst_label }}">{{ col_data.worst_label }}</span></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty-state">Baseline drift not available.</p>
+  {% endif %}
+</details>
+
+{# ── C11b: FSI + Drift Velocity ───────────────────────── #}
+<details class="section-card">
+  <summary class="sec-hdr">
+    C11b · Feature Stability Index &amp; Drift Velocity
+    {% set unstable_count = namespace(n=0) %}
+    {% for col, fsi in ds.fsi.items() %}{% if fsi.label == 'unstable' %}{% set unstable_count.n = unstable_count.n + 1 %}{% endif %}{% endfor %}
+    {% if unstable_count.n > 0 %}<span class="sec-badge badge-red">{{ unstable_count.n }} unstable</span>{% endif %}
+  </summary>
+  <div class="narrative-card" style="margin-bottom:1rem;">
+    <div class="nc-label">FSI &amp; Velocity explained</div>
+    <div class="nc-text">
+      <strong>FSI</strong> = 1 − (mean PSI / 0.25). FSI ≥ 0.70 = stable across all versions.
+      Below 0.40 = feature is drifting consistently — consider dropping or re-training.
+      Used in Basel model monitoring and SAS Model Manager.<br>
+      <strong>Drift Velocity</strong> = PSI slope per version (least-squares).
+      PSI=0.30 over 10 versions is less alarming than PSI=0.30 in 2 versions.
+      Positive = accelerating drift. Negative = recovering.
+    </div>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr><th>Column</th><th>FSI</th><th>Stability</th><th>Mean PSI</th><th>Velocity/ver</th><th>Verdict</th></tr>
+    </thead>
+    <tbody>
+    {% for col_name, fsi in ds.fsi.items() %}
+    {% set vel = ds.velocity.get(col_name, {}) %}
+    <tr {% if fsi.label == 'unstable' or vel.get('label') == 'critical' %}class="row-highlight"{% endif %}>
+      <td><code>{{ col_name }}</code></td>
+      <td>
+        {% if fsi.applicable and fsi.fsi is not none %}
+        <div class="score-chip {% if fsi.fsi >= 0.70 %}sc-good{% elif fsi.fsi >= 0.40 %}sc-fair{% else %}sc-critical{% endif %}">
+          {{ fsi.fsi }}
+        </div>
+        {% else %}<span class="tag tag-gray">n/a</span>{% endif %}
+      </td>
+      <td>
+        {% if fsi.applicable %}
+        <span class="trend-badge trend-{{ fsi.label }}">{{ fsi.label }}</span>
+        {% endif %}
+      </td>
+      <td style="font-size:.78rem;color:var(--text2);">{{ fsi.mean_psi if fsi.applicable else '—' }}</td>
+      <td>
+        {% if vel and vel.applicable and vel.velocity is not none %}
+        <span style="font-size:.8rem;font-weight:600;color:{% if vel.velocity > 0 %}#ef4444{% elif vel.velocity < 0 %}#22c55e{% else %}var(--text2){% endif %}">
+          {{ '+' if vel.velocity > 0 else '' }}{{ vel.velocity }}/ver
+        </span>
+        {% else %}<span class="tag tag-gray">need ≥3 ver</span>{% endif %}
+      </td>
+      <td>
+        {% if vel and vel.applicable %}
+        <span class="drift-badge drift-{{ vel.label }}">{{ vel.label }}</span>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+
+{# ── C11c: Per-column Advanced Metrics ───────────────── #}
+<details class="section-card">
+  <summary class="sec-hdr">C11c · Advanced Per-Column Drift Metrics</summary>
+  <div class="narrative-card" style="margin-bottom:1rem;">
+    <div class="nc-label">Metrics computed</div>
+    <div class="nc-text">
+      <strong>CV Drift</strong>: relative spread change (std/mean) — detects instability independent of scale.<br>
+      <strong>Std Drift</strong>: spread widening/narrowing — same mean, wider distribution breaks model expectations.<br>
+      <strong>Quantile Shift</strong>: Q1/Median/Q3 tracked independently — tells you WHERE the shift is happening.<br>
+      <strong>Boundary Drift</strong>: min/max range change — model extrapolates beyond training range.<br>
+      <strong>Kurtosis Drift</strong>: tail behaviour change — heavier tails at scoring time than at training.<br>
+      <strong>KS Statistic</strong>: max CDF deviation (approximated from quantiles) — second independent drift signal.
+      Only notable/critical issues shown below.
+    </div>
+  </div>
+
+  {% set any_notable = namespace(found=false) %}
+  {% for col_name, pair_list in ds.consecutive.items() %}
+    {% set col_has_issue = namespace(found=false) %}
+    {% for pm in pair_list %}{% if pm %}
+      {% for mk in ['cv_drift','std_drift','quantile_shift','boundary_drift','kurtosis_drift','ks_approx'] %}
+        {% if pm[mk] is defined and pm[mk].applicable and pm[mk].severity in ('notable','critical') %}
+          {% set col_has_issue.found = true %}{% set any_notable.found = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}{% endfor %}
+
+    {% if col_has_issue.found %}
+    <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:.75rem;">
+      <div style="padding:.6rem 1rem;background:var(--bg3);font-size:.82rem;font-weight:600;">
+        <code>{{ col_name }}</code>
+      </div>
+      <div style="padding:.75rem 1rem;">
+      {% for i in range(pair_list|length) %}{% set pm = pair_list[i] %}{% if pm %}
+        <div style="font-size:.72rem;color:var(--text3);margin:.4rem 0 .3rem;">
+          {{ ds.version_labels[i] }} → {{ ds.version_labels[i+1] if i+1 < ds.version_labels|length else '?' }}
+        </div>
+        {% for mk, ml, md in [
+          ('cv_drift',       'CV Drift',        'Relative spread change'),
+          ('std_drift',      'Std Drift',        'Absolute spread change'),
+          ('quantile_shift', 'Quantile Shift',   'Q1/Median/Q3 movement'),
+          ('boundary_drift', 'Boundary Drift',   'Range expansion/compression'),
+          ('kurtosis_drift', 'Kurtosis Drift',   'Tail behaviour change'),
+          ('ks_approx',      'KS Statistic',     'Max CDF deviation'),
+        ] %}
+          {% if pm[mk] is defined and pm[mk].applicable and pm[mk].severity in ('notable','critical') %}
+          <div style="display:flex;align-items:flex-start;gap:.75rem;padding:.4rem 0;border-bottom:0.5px solid var(--border);">
+            <span class="drift-badge drift-{{ pm[mk].severity }}" style="flex-shrink:0;min-width:68px;text-align:center;">
+              {{ pm[mk].severity }}
+            </span>
+            <div>
+              <div style="font-size:.78rem;font-weight:600;color:var(--text);">{{ ml }}</div>
+              <div style="font-size:.72rem;color:var(--text3);">{{ md }}</div>
+              {% if pm[mk].interpretation is defined %}
+              <div style="font-size:.78rem;color:var(--text2);margin-top:.2rem;">{{ pm[mk].interpretation }}</div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}{% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  {% if not any_notable.found %}
+  <p class="empty-state">✓ No notable advanced metric changes across any version pair.</p>
+  {% endif %}
+</details>
+
+{% endif %}
+
+
+
+{# ══════════════════════════════════════════════════════════════════════════
+   INTERPRETATION LAYER  (I4 · I5 · I6 · I7 · I8 · I9)
+   Append this entire block to compare_results.html, just before {% endblock %}
+   Only renders when the interpretation keys exist in results.
+   No new CSS classes — uses only what already exists in style.css.
+══════════════════════════════════════════════════════════════════════════ #}
+
+{% if r.i4 or r.i5 or r.i6 or r.i7 or r.i8 or r.i9 %}
+
+<div style="margin-top:2rem; padding-top:1.5rem; border-top:2px solid var(--border);">
+  <h2 style="font-size:1rem; font-weight:700; color:var(--text2);
+             letter-spacing:.05em; text-transform:uppercase; margin-bottom:1.25rem;">
+    Interpretations & Actions
+  </h2>
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I7 · Model Action Decision  (shown first — most decision-critical)
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i7 %}
+{% set dec = r.i7.decision %}
+{% set urg = r.i7.urgency %}
+
+{# Pick border colour by decision #}
+{% if dec == 'retrain' %}
+  {% set dec_color = 'var(--red)' %}
+  {% set dec_bg    = 'rgba(239,68,68,.05)' %}
+  {% set dec_border= 'var(--red-dim)' %}
+{% elif dec in ('rebin', 'rebin_and_recalibrate') %}
+  {% set dec_color = 'var(--amber)' %}
+  {% set dec_bg    = 'rgba(245,158,11,.04)' %}
+  {% set dec_border= 'var(--amber-dim)' %}
+{% elif dec == 'recalibrate' %}
+  {% set dec_color = 'var(--blue)' %}
+  {% set dec_bg    = 'rgba(59,130,246,.04)' %}
+  {% set dec_border= 'var(--blue-dim)' %}
+{% else %}
+  {% set dec_color = 'var(--green)' %}
+  {% set dec_bg    = 'rgba(34,197,94,.04)' %}
+  {% set dec_border= 'var(--green-dim)' %}
+{% endif %}
+
+<details class="section-card" open>
+  <summary class="sec-hdr">
+    I7 · Model Action Decision
+    {% if dec == 'retrain' %}
+      <span class="sec-badge badge-red">Retrain required</span>
+    {% elif dec in ('rebin','rebin_and_recalibrate') %}
+      <span class="sec-badge badge-amber">Rebin &amp; recalibrate</span>
+    {% elif dec == 'recalibrate' %}
+      <span class="sec-badge badge-blue">Recalibrate threshold</span>
+    {% elif dec == 'hold' and r.i7.urgency == 'pipeline_fix_first' %}
+      <span class="sec-badge badge-amber">Fix pipeline first</span>
+    {% else %}
+      <span class="sec-badge badge-green">Hold — monitor</span>
+    {% endif %}
+    {% if urg == 'immediate' %}
+      <span class="sec-badge badge-red">Immediate</span>
+    {% elif urg == 'next_cycle' %}
+      <span class="sec-badge badge-amber">Next cycle</span>
+    {% endif %}
+  </summary>
+
+  {# Decision block #}
+  <div style="border:1px solid {{ dec_border }}; border-left:4px solid {{ dec_color }};
+              border-radius:var(--radius); padding:1rem 1.25rem;
+              background:{{ dec_bg }}; margin-bottom:1rem;">
+    <div style="font-size:.95rem; font-weight:700; color:{{ dec_color }};
+                text-transform:uppercase; letter-spacing:.04em; margin-bottom:.4rem;">
+      {{ dec | replace('_',' ') }}
+    </div>
+    <div style="font-size:.83rem; color:var(--text2); line-height:1.6; margin-bottom:.75rem;">
+      {{ r.i7.reason }}
+    </div>
+
+    {# Ordered steps #}
+    {% if r.i7.steps %}
+    <div style="margin-bottom:.75rem;">
+      <div style="font-size:.72rem; font-weight:600; text-transform:uppercase;
+                  letter-spacing:.05em; color:var(--text3); margin-bottom:.4rem;">
+        Steps — in order
+      </div>
+      {% for step in r.i7.steps %}
+      <div style="display:flex; gap:.6rem; font-size:.81rem; color:var(--text2);
+                  padding:.3rem 0;
+                  {% if not loop.last %}border-bottom:1px solid var(--border);{% endif %}">
+        <span style="flex-shrink:0; font-weight:600; color:var(--text3);
+                     min-width:1.4rem;">{{ loop.index }}.</span>
+        <span>{{ step }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Avoid block #}
+    {% if r.i7.avoid %}
+    <div style="font-size:.79rem; color:var(--text3); padding:.5rem .75rem;
+                background:var(--bg3); border-radius:6px; border-left:2px solid var(--border);">
+      <strong style="color:var(--text2);">Do not:</strong> {{ r.i7.avoid }}
+    </div>
+    {% endif %}
+  </div>
+
+  {# Supporting signals row #}
+  {% if r.i7.accelerating_cols or r.i7.unstable_cols %}
+  <div style="display:flex; flex-wrap:wrap; gap:.75rem;">
+    {% if r.i7.accelerating_cols %}
+    <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius);
+                padding:.6rem .875rem; flex:1; min-width:200px;">
+      <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                  letter-spacing:.04em; color:var(--red); margin-bottom:.3rem;">
+        Drift accelerating
+      </div>
+      <div style="font-size:.79rem; color:var(--text2);">
+        {{ r.i7.accelerating_cols | join(', ') }}
+      </div>
+      <div style="font-size:.73rem; color:var(--text3); margin-top:.2rem;">
+        PSI increasing &gt;0.05/version — these features are moving fast.
+      </div>
+    </div>
+    {% endif %}
+    {% if r.i7.unstable_cols %}
+    <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius);
+                padding:.6rem .875rem; flex:1; min-width:200px;">
+      <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                  letter-spacing:.04em; color:var(--amber); margin-bottom:.3rem;">
+        Chronically unstable (FSI &lt; 0.40)
+      </div>
+      <div style="font-size:.79rem; color:var(--text2);">
+        {{ r.i7.unstable_cols | join(', ') }}
+      </div>
+      <div style="font-size:.73rem; color:var(--text3); margin-top:.2rem;">
+        Drifting consistently across all version pairs. Consider dropping.
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</details>
+{% endif %}
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I4 · Population Shift Assessment
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i4 %}
+<details class="section-card">
+  <summary class="sec-hdr">
+    I4 · Population Shift Assessment
+    {% if r.i4.shift_scope == 'broad' %}
+      <span class="sec-badge badge-red">Broad shift — {{ r.i4.drifted_count }}/{{ r.i4.total_features }} features</span>
+    {% elif r.i4.shift_scope == 'narrow' %}
+      <span class="sec-badge badge-amber">Narrow shift — {{ r.i4.drifted_count }}/{{ r.i4.total_features }} features</span>
+    {% else %}
+      <span class="sec-badge badge-green">Stable population</span>
+    {% endif %}
+    {% if r.i4.v1_distance == 'far' %}
+      <span class="sec-badge badge-red">Far from V1</span>
+    {% elif r.i4.v1_distance == 'moderate' %}
+      <span class="sec-badge badge-amber">Moderate V1 distance</span>
+    {% endif %}
+  </summary>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; margin-bottom:1rem;">
+    <div class="metric-card
+      {% if r.i4.shift_scope == 'broad' %}mc-red
+      {% elif r.i4.shift_scope == 'narrow' %}mc-amber
+      {% else %}mc-green{% endif %}">
+      <div class="mv" style="font-size:1.2rem;">
+        {{ r.i4.drifted_count }}/{{ r.i4.total_features }}
+      </div>
+      <div class="ml">Features drifted</div>
+    </div>
+    <div class="metric-card">
+      <div class="mv" style="font-size:1.1rem;">{{ r.i4.v1_distance | replace('_',' ') }}</div>
+      <div class="ml">Distance from V1 (training baseline)</div>
+    </div>
+    <div class="metric-card {% if r.i4.row_delta_pct and r.i4.row_delta_pct|abs > 20 %}mc-amber{% endif %}">
+      <div class="mv" style="font-size:1.1rem;">
+        {% if r.i4.row_delta_pct is not none %}
+          {{ '+' if r.i4.row_delta_pct > 0 }}{{ r.i4.row_delta_pct }}%
+        {% else %}—{% endif %}
+      </div>
+      <div class="ml">Row count delta (latest pair)</div>
+    </div>
+  </div>
+
+  <div style="border:1px solid var(--border); border-radius:var(--radius);
+              padding:.875rem 1rem; margin-bottom:.75rem;">
+    <div style="font-size:.72rem; font-weight:600; text-transform:uppercase;
+                letter-spacing:.05em; color:var(--text3); margin-bottom:.35rem;">
+      Interpretation
+    </div>
+    <div style="font-size:.82rem; color:var(--text2); line-height:1.6; margin-bottom:.5rem;">
+      {{ r.i4.interpretation }}
+    </div>
+    {% if r.i4.coordinated %}
+    <div style="font-size:.79rem; color:var(--amber); margin-bottom:.4rem;">
+      Features are moving in a coordinated direction — this points to an organic population
+      event rather than isolated noise.
+    </div>
+    {% endif %}
+    <div style="font-size:.82rem; color:var(--text); font-weight:500;">
+      → {{ r.i4.action }}
+    </div>
+  </div>
+
+  {% if r.i4.drifted_features %}
+  <div style="font-size:.78rem; color:var(--text3);">
+    <strong style="color:var(--text2);">Drifted features:</strong>
+    {{ r.i4.drifted_features | join(', ') }}
+  </div>
+  {% endif %}
+
+</details>
+{% endif %}
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I5 · Target Stability
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i5 %}
+<details class="section-card" {% if r.i5.target_found and r.i5.drift_type not in ('stable', None) %}open{% endif %}>
+  <summary class="sec-hdr">
+    I5 · Target Stability
+    {% if not r.i5.target_found %}
+      <span class="sec-badge">No target</span>
+    {% elif r.i5.drift_type == 'label_change' %}
+      <span class="sec-badge badge-red">Label change suspected</span>
+    {% elif r.i5.drift_type == 'data_loss' %}
+      <span class="sec-badge badge-amber">Data loss — not real drift</span>
+    {% elif r.i5.drift_type == 'organic_jump' %}
+      <span class="sec-badge badge-amber">Rapid organic shift</span>
+    {% elif r.i5.drift_type == 'organic_gradual' %}
+      <span class="sec-badge badge-blue">Gradual organic drift</span>
+    {% else %}
+      <span class="sec-badge badge-green">Stable</span>
+    {% endif %}
+  </summary>
+
+  {% if not r.i5.target_found %}
+  <p class="empty-state">{{ r.i5.action }}</p>
+  {% else %}
+
+  {# Event rate row #}
+  {% if r.i5.event_rate_first is not none and r.i5.event_rate_last is not none %}
+  <div style="display:flex; align-items:center; gap:.75rem; flex-wrap:wrap; margin-bottom:1rem;">
+    <div class="metric-card">
+      <div class="mv" style="font-size:1.3rem;">{{ r.i5.event_rate_first }}%</div>
+      <div class="ml">Event rate — V1</div>
+    </div>
+    <div style="font-size:1.4rem; color:var(--text3);">→</div>
+    <div class="metric-card
+      {% if r.i5.total_drift_pp|abs > 5 %}mc-red
+      {% elif r.i5.total_drift_pp|abs > 2 %}mc-amber
+      {% else %}mc-green{% endif %}">
+      <div class="mv" style="font-size:1.3rem;">{{ r.i5.event_rate_last }}%</div>
+      <div class="ml">Event rate — latest</div>
+    </div>
+    <div class="metric-card {% if r.i5.total_drift_pp|abs > 5 %}mc-red{% elif r.i5.total_drift_pp|abs > 2 %}mc-amber{% endif %}">
+      <div class="mv" style="font-size:1.3rem;">
+        {{ '+' if r.i5.total_drift_pp > 0 }}{{ r.i5.total_drift_pp }}pp
+      </div>
+      <div class="ml">Total drift</div>
+    </div>
+    {% if r.i5.max_single_jump_pp is not none and r.i5.max_single_jump_pp > 0 %}
+    <div class="metric-card {% if r.i5.max_single_jump_pp > 5 %}mc-red{% endif %}">
+      <div class="mv" style="font-size:1.3rem;">{{ r.i5.max_single_jump_pp }}pp</div>
+      <div class="ml">Largest single-version jump</div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# Cause + impact block #}
+  <div style="border:1px solid var(--border); border-radius:var(--radius);
+              padding:.875rem 1rem; margin-bottom:.75rem;">
+    <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.4rem;">
+      <span style="font-size:.72rem; font-weight:600; text-transform:uppercase;
+                   letter-spacing:.05em; color:var(--text3);">Drift type</span>
+      <span class="tag
+        {% if r.i5.drift_type == 'label_change' %}tag-red
+        {% elif r.i5.drift_type == 'data_loss' %}tag-amber
+        {% elif r.i5.drift_type in ('organic_jump','organic_gradual') %}tag-blue
+        {% else %}tag-green{% endif %}">
+        {{ r.i5.drift_type | replace('_',' ') if r.i5.drift_type else 'stable' }}
+      </span>
+    </div>
+
+    <div style="font-size:.82rem; color:var(--text2); line-height:1.6; margin-bottom:.5rem;">
+      {{ r.i5.model_impact }}
+    </div>
+
+    {# Flags #}
+    {% if r.i5.data_loss_risk %}
+    <div style="font-size:.79rem; color:var(--amber); background:var(--amber-dim);
+                padding:.3rem .6rem; border-radius:4px; display:inline-block; margin-bottom:.4rem;">
+      Target completeness is degrading — fix pipeline before any model action.
+    </div>
+    {% endif %}
+    {% if r.i5.label_change_risk %}
+    <div style="font-size:.79rem; color:var(--red); background:var(--red-dim);
+                padding:.3rem .6rem; border-radius:4px; display:inline-block; margin-bottom:.4rem;">
+      Label change suspected — verify with the business team before retraining.
+    </div>
+    {% endif %}
+
+    <div style="font-size:.82rem; color:var(--text); font-weight:500; margin-top:.25rem;">
+      → {{ r.i5.action }}
+    </div>
+  </div>
+
+  {% endif %}
+</details>
+{% endif %}
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I6 · Feature Drift Impact
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i6 %}
+{% set real_drifts = r.i6 | selectattr('is_real_drift') | list %}
+{% set false_drifts = r.i6 | rejectattr('is_real_drift') | list %}
+
+<details class="section-card" {% if real_drifts %}open{% endif %}>
+  <summary class="sec-hdr">
+    I6 · Feature Drift Impact
+    {% if real_drifts %}
+      <span class="sec-badge badge-amber">{{ real_drifts | length }} genuine drift{{ 's' if real_drifts|length != 1 }}</span>
+    {% endif %}
+    {% if false_drifts %}
+      <span class="sec-badge badge-blue">{{ false_drifts | length }} data-loss false positive{{ 's' if false_drifts|length != 1 }}</span>
+    {% endif %}
+    {% if not r.i6 %}
+      <span class="sec-badge badge-green">No actionable drift</span>
+    {% endif %}
+  </summary>
+
+  <p style="font-size:.8rem; color:var(--text3); margin-bottom:1rem;">
+    PSI flags that are caused by data loss are separated from genuine population drift.
+    Only genuine drift requires model action.
+  </p>
+
+  {# Genuine drifts #}
+  {% if real_drifts %}
+  <div style="margin-bottom:1.25rem;">
+    <div style="font-size:.74rem; font-weight:600; text-transform:uppercase;
+                letter-spacing:.05em; color:var(--amber); margin-bottom:.5rem;">
+      Genuine drift — model action required
+    </div>
+    {% for item in real_drifts %}
+    <div style="border:1px solid var(--border); border-radius:var(--radius);
+                padding:.875rem 1rem; margin-bottom:.5rem;">
+
+      <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.4rem;">
+        <code style="font-size:.82rem; font-weight:600;">{{ item.column }}</code>
+        <span class="drift-badge drift-{{ item.psi_label }}">PSI: {{ item.psi_label }}</span>
+        <span class="tag tag-amber">{{ item.drift_cause | replace('_',' ') }}</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:.75rem;">
+        <div>
+          <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                      letter-spacing:.04em; color:var(--text3); margin-bottom:.25rem;">Evidence</div>
+          <div style="font-size:.8rem; color:var(--text2); line-height:1.5;">{{ item.evidence }}</div>
+        </div>
+        <div>
+          <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                      letter-spacing:.04em; color:var(--text3); margin-bottom:.25rem;">Model impact</div>
+          <div style="font-size:.8rem; color:var(--text2); line-height:1.5;">{{ item.model_impact }}</div>
+        </div>
+      </div>
+
+      <div style="margin-top:.5rem; padding:.4rem .75rem; background:var(--bg3);
+                  border-radius:6px; font-size:.79rem; color:var(--text2);
+                  border-left:2px solid var(--amber);">
+        <strong style="color:var(--text);">Fix:</strong> {{ item.fix }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# Data-loss false positives #}
+  {% if false_drifts %}
+  <div>
+    <div style="font-size:.74rem; font-weight:600; text-transform:uppercase;
+                letter-spacing:.05em; color:var(--blue); margin-bottom:.5rem;">
+      Data-loss false positives — fix pipeline, not model
+    </div>
+    {% for item in false_drifts %}
+    <div style="border:1px solid var(--blue-dim); border-radius:var(--radius);
+                padding:.75rem 1rem; margin-bottom:.4rem;
+                background:rgba(59,130,246,.03);">
+      <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.3rem;">
+        <code style="font-size:.82rem; font-weight:600;">{{ item.column }}</code>
+        <span class="drift-badge drift-{{ item.psi_label }}">PSI: {{ item.psi_label }}</span>
+        <span class="tag tag-blue">data_loss</span>
+      </div>
+      <div style="font-size:.79rem; color:var(--text2); line-height:1.5; margin-bottom:.3rem;">
+        {{ item.evidence }}
+      </div>
+      <div style="font-size:.78rem; color:var(--text3); font-style:italic;">
+        → {{ item.fix }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if not r.i6 %}
+  <p class="empty-state">✓ No PSI-flagged columns found.</p>
+  {% endif %}
+
+</details>
+{% endif %}
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I8 · Scoring Pipeline Break Risks
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i8 %}
+{% set critical_risks = r.i8 | selectattr('severity','eq','critical') | list %}
+{% set notable_risks  = r.i8 | selectattr('severity','eq','notable')  | list %}
+
+<details class="section-card" {% if r.i8 %}open{% endif %}>
+  <summary class="sec-hdr">
+    I8 · Scoring Pipeline Break Risks
+    {% if critical_risks %}
+      <span class="sec-badge badge-red">{{ critical_risks | length }} critical</span>
+    {% endif %}
+    {% if notable_risks %}
+      <span class="sec-badge badge-amber">{{ notable_risks | length }} notable</span>
+    {% endif %}
+    {% if not r.i8 %}
+      <span class="sec-badge badge-green">No risks detected</span>
+    {% endif %}
+  </summary>
+
+  <p style="font-size:.8rem; color:var(--text3); margin-bottom:1rem;">
+    Silent failures — no error is raised, but the model produces wrong scores.
+    These must be fixed before deploying against the latest version data.
+  </p>
+
+  {% if not r.i8 %}
+  <p class="empty-state">✓ No scoring pipeline break risks detected between the last two versions.</p>
+  {% else %}
+
+  {# Risk type labels #}
+  {% set risk_labels = {
+    'dropped_feature':    ('Dropped model feature',    'tag-red'),
+    'type_mismatch':      ('Data type changed',        'tag-red'),
+    'unseen_category':    ('Unseen category values',   'tag-amber'),
+    'range_extrapolation':('Range extrapolation',      'tag-amber'),
+  } %}
+
+  {% for risk in r.i8 %}
+  {% set rl = risk_labels.get(risk.risk, (risk.risk | replace('_',' '), 'tag-gray')) %}
+  <div style="border:1px solid
+    {% if risk.severity == 'critical' %}var(--red-dim){% else %}var(--amber-dim){% endif %};
+    border-left: 4px solid
+    {% if risk.severity == 'critical' %}var(--red){% else %}var(--amber){% endif %};
+    border-radius:var(--radius); padding:.875rem 1rem; margin-bottom:.75rem;
+    background:{% if risk.severity == 'critical' %}rgba(239,68,68,.04){% else %}rgba(245,158,11,.03){% endif %};">
+
+    <div style="display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; margin-bottom:.4rem;">
+      <span class="tag {{ rl[1] }}" style="font-size:.72rem;">{{ rl[0] }}</span>
+      <code style="font-size:.82rem; font-weight:600;">{{ risk.column }}</code>
+      <span class="tag {% if risk.severity == 'critical' %}tag-red{% else %}tag-amber{% endif %}">
+        {{ risk.severity }}
+      </span>
+    </div>
+
+    <div style="font-size:.81rem; color:var(--text2); line-height:1.6; margin-bottom:.5rem;">
+      {{ risk.detail }}
+    </div>
+
+    <div style="font-size:.79rem; padding:.4rem .75rem; background:var(--bg3);
+                border-radius:6px; border-left:2px solid
+                {% if risk.severity == 'critical' %}var(--red){% else %}var(--amber){% endif %};
+                color:var(--text2);">
+      <strong style="color:var(--text);">Fix:</strong> {{ risk.fix }}
+    </div>
+  </div>
+  {% endfor %}
+
+  {% endif %}
+</details>
+{% endif %}
+
+
+{# ──────────────────────────────────────────────────────────────────────────
+   I9 · Data Pipeline Health
+────────────────────────────────────────────────────────────────────────── #}
+{% if r.i9 %}
+<details class="section-card"
+  {% if r.i9.pipeline_health == 'degrading' %}open{% endif %}>
+  <summary class="sec-hdr">
+    I9 · Data Pipeline Health
+    {% if r.i9.pipeline_health == 'degrading' and r.i9.pattern == 'systematic' %}
+      <span class="sec-badge badge-red">Systematic degradation</span>
+      {% if r.i9.escalate_to_engineering %}
+        <span class="sec-badge badge-red">Escalate to engineering</span>
+      {% endif %}
+    {% elif r.i9.pipeline_health == 'degrading' and r.i9.pattern == 'isolated' %}
+      <span class="sec-badge badge-amber">Isolated issues</span>
+    {% elif r.i9.pipeline_health == 'recovering' %}
+      <span class="sec-badge badge-blue">Recovering</span>
+    {% elif r.i9.pipeline_health == 'improving' %}
+      <span class="sec-badge badge-green">Improving</span>
+    {% else %}
+      <span class="sec-badge badge-green">Stable</span>
+    {% endif %}
+    {% if r.i9.health_score_delta is not none %}
+      <span class="sec-badge
+        {% if r.i9.health_score_delta < -5 %}badge-red
+        {% elif r.i9.health_score_delta > 3 %}badge-green
+        {% else %}badge-blue{% endif %}">
+        Health {{ '+' if r.i9.health_score_delta > 0 }}{{ r.i9.health_score_delta }} pts
+      </span>
+    {% endif %}
+  </summary>
+
+  {# Stats row #}
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+              gap:.75rem; margin-bottom:1rem;">
+    <div class="metric-card
+      {% if r.i9.affected_columns | length > 0 %}mc-red{% else %}mc-green{% endif %}">
+      <div class="mv" style="font-size:1.4rem;">{{ r.i9.affected_columns | length }}</div>
+      <div class="ml">Degrading columns</div>
+    </div>
+    <div class="metric-card {% if r.i9.quality_regressing | length > 0 %}mc-amber{% endif %}">
+      <div class="mv" style="font-size:1.4rem;">{{ r.i9.quality_regressing | length }}</div>
+      <div class="ml">Quality regression (mismatches/blanks)</div>
+    </div>
+    <div class="metric-card {% if r.i9.recovering_columns | length > 0 %}mc-green{% endif %}">
+      <div class="mv" style="font-size:1.4rem;">{{ r.i9.recovering_columns | length }}</div>
+      <div class="ml">Recovering columns</div>
+    </div>
+    {% if r.i9.health_score_delta is not none %}
+    <div class="metric-card
+      {% if r.i9.health_score_delta < -5 %}mc-red
+      {% elif r.i9.health_score_delta > 3 %}mc-green
+      {% else %}mc-amber{% endif %}">
+      <div class="mv" style="font-size:1.4rem;">
+        {{ '+' if r.i9.health_score_delta > 0 }}{{ r.i9.health_score_delta }}
+      </div>
+      <div class="ml">Dataset health pts (V1→latest)</div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Main action block #}
+  <div style="border:1px solid
+    {% if r.i9.escalate_to_engineering %}var(--red-dim)
+    {% elif r.i9.pipeline_health == 'degrading' %}var(--amber-dim)
+    {% else %}var(--border){% endif %};
+    border-radius:var(--radius); padding:.875rem 1rem; margin-bottom:.75rem;">
+
+    {% if r.i9.escalate_to_engineering %}
+    <div style="font-size:.79rem; font-weight:700; color:var(--red);
+                margin-bottom:.4rem; text-transform:uppercase; letter-spacing:.04em;">
+      Engineering escalation required
+    </div>
+    {% endif %}
+
+    <div style="font-size:.82rem; color:var(--text2); line-height:1.6; margin-bottom:.5rem;">
+      {{ r.i9.likely_cause }}
+    </div>
+
+    <div style="font-size:.82rem; color:var(--text); font-weight:500;">
+      → {{ r.i9.action }}
+    </div>
+
+    {% if r.i9.first_seen_version %}
+    <div style="font-size:.75rem; color:var(--text3); margin-top:.35rem;">
+      Degradation first detected in version: <strong>{{ r.i9.first_seen_version }}</strong>
+    </div>
+    {% endif %}
+  </div>
+
+  {# Affected columns breakdown #}
+  {% if r.i9.affected_columns %}
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:.75rem;">
+    <div style="background:var(--bg3); border:1px solid var(--border);
+                border-radius:var(--radius); padding:.6rem .875rem;">
+      <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                  letter-spacing:.04em; color:var(--red); margin-bottom:.3rem;">
+        Missing/completeness degrading
+      </div>
+      <div style="font-size:.79rem; color:var(--text2); line-height:1.6;">
+        {{ r.i9.affected_columns | join(', ') }}
+      </div>
+    </div>
+    {% if r.i9.quality_regressing %}
+    <div style="background:var(--bg3); border:1px solid var(--border);
+                border-radius:var(--radius); padding:.6rem .875rem;">
+      <div style="font-size:.71rem; font-weight:600; text-transform:uppercase;
+                  letter-spacing:.04em; color:var(--amber); margin-bottom:.3rem;">
+        Quality regressing (mismatches / blanks)
+      </div>
+      <div style="font-size:.79rem; color:var(--text2); line-height:1.6;">
+        {{ r.i9.quality_regressing | join(', ') }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if r.i9.sparse_columns %}
+  <div style="margin-top:.75rem; font-size:.78rem; color:var(--text3);">
+    <strong style="color:var(--text2);">Always sparse (&lt;50% complete throughout):</strong>
+    {{ r.i9.sparse_columns | join(', ') }} — structural absence, not a new regression.
+  </div>
+  {% endif %}
+
+</details>
+{% endif %}
+
+
+</div>{# end interpretation layer wrapper #}
+{% endif %}{# end outer if any i-section #}
 
 {% endblock %}

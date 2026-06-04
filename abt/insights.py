@@ -548,46 +548,62 @@ def _action(column, action, why, effort, severity, impact) -> Dict:
 def dataset_readiness_score(health_scores: Dict[str, Dict],
                              readiness_statuses: List[Dict]) -> Dict:
     """
-    Weighted average of column health scores.
-    Weights: drop=0 (excluded), caution=0.5 weight, ready=1.0 weight.
-    Target column excluded.
+    Weighted average of column health scores, with blocked columns counted as score=0.
 
-    Returns: {score, label, total_cols, included_cols, excluded_cols}
+    Weights per readiness status:
+      ready   = 1.0  (full contribution)
+      caution = 0.5  (half contribution)
+      drop    = 0.0  score treated as zero, still in denominator
+
+    Dropped columns count in the denominator — a dataset where 50% of columns
+    are blocked cannot score above 50. Target column excluded entirely.
+
+    Returns: {score, label, total_cols, feature_cols, blocked_cols, caution_cols, ready_cols}
     """
     status_map = {r["column"]: r["status"] for r in readiness_statuses}
-    status_weight = {"ready": 1.0, "caution": 0.5, "drop": 0.0}
 
-    total_w = 0.0
+    total_w      = 0.0
     weighted_sum = 0.0
-    included = 0
-    excluded = 0
+    blocked_cols = 0
+    caution_cols = 0
+    ready_cols   = 0
+    target_cols  = 0
 
     for col_name, hs in health_scores.items():
         if col_name.lower() in TARGET_NAMES:
-            excluded += 1
+            target_cols += 1
             continue
         st = status_map.get(col_name, "ready")
-        w  = status_weight.get(st, 1.0)
         if st == "drop":
-            excluded += 1
-            continue
-        weighted_sum += hs["score"] * w
-        total_w      += w
-        included     += 1
+            total_w      += 1.0   # zero score, full weight — drags average down
+            weighted_sum += 0.0
+            blocked_cols += 1
+        elif st == "caution":
+            total_w      += 0.5
+            weighted_sum += hs["score"] * 0.5
+            caution_cols += 1
+        else:
+            total_w      += 1.0
+            weighted_sum += hs["score"] * 1.0
+            ready_cols   += 1
 
     score = round(weighted_sum / total_w, 1) if total_w > 0 else 0.0
 
+    # Tighter thresholds — align with real modeling requirements
     if score >= 80:   label = "ready"
-    elif score >= 60: label = "mostly_ready"
-    elif score >= 40: label = "needs_work"
+    elif score >= 65: label = "mostly_ready"
+    elif score >= 45: label = "needs_work"
     else:             label = "not_ready"
 
     return {
         "score":        score,
         "label":        label,
         "total_cols":   len(health_scores),
-        "included_cols":included,
-        "excluded_cols":excluded,
+        "feature_cols": blocked_cols + caution_cols + ready_cols,
+        "blocked_cols": blocked_cols,
+        "caution_cols": caution_cols,
+        "ready_cols":   ready_cols,
+        "target_cols":  target_cols,
     }
 
 

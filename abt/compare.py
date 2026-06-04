@@ -1,4 +1,3 @@
-# VERSION 2: Monday 4pm
 """
 abt/compare.py  —  7-section comparison + insight layers for N ABT versions.
 
@@ -12,10 +11,13 @@ Scales cleanly to 10–15 versions without any structural changes.
 """
 
 from typing import Dict, List, Optional
+
+from abt.drift_metrics import _psi_matrix_union, compute_column_drift_suite
 from .columnProfile import ABTProfile
 from .analyze import (s2_blockers, s3_warnings, s4_governance, s5_readiness,
                        s8_column_health_scores, TARGET_NAMES)
 from .insights import psi_matrix, _safe
+from .drift_metrics import _union_cols
 
 DRIFT_NOTABLE          = 0.20
 DRIFT_SEVERE           = 0.50
@@ -31,13 +33,6 @@ def _ord(s: str) -> int:
 def _worsened(a, b): return _ord(b) > _ord(a)
 def _improved(a, b): return _ord(b) < _ord(a)
 
-def _union_cols(abts: List[ABTProfile]) -> List[str]:
-    seen, order = set(), []
-    for a in abts:
-        for n in a.column_names:
-            if n not in seen:
-                seen.add(n); order.append(n)
-    return order
 
 def _trend(vals: List) -> str:
     c = [v for v in vals if v is not None]
@@ -336,7 +331,7 @@ def c7_readiness_change(abts: List[ABTProfile]) -> List[Dict]:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# C8  PSI Matrix  ← NEW
+# C8  PSI Matrix  with UNION Boundaries
 # ─────────────────────────────────────────────────────────────────────────────
 def c8_psi_matrix(abts: List[ABTProfile]) -> Dict:
     """
@@ -348,7 +343,8 @@ def c8_psi_matrix(abts: List[ABTProfile]) -> Dict:
         columns        : list of {column, scale, pairs: [{from, to, psi, label, note}]}
         summary        : {stable_count, monitor_count, shift_count, critical_columns}
     """
-    raw = psi_matrix(abts)
+    #raw = psi_matrix(abts)
+    raw = _psi_matrix_union(abts)
     columns = []
     stable_count = monitor_count = shift_count = 0
     critical_columns = []
@@ -487,10 +483,15 @@ def c9_health_score_trend(abts: List[ABTProfile]) -> Dict:
 def c0_compare_verdict(c5_result: Optional[Dict], c8_result: Dict,
                          c9_result: Dict, c1_result: Dict) -> Dict:
     """
-    Synthesises all compare sections into a single verdict used as the
-    page headline. Determines whether back-testing is mandatory.
-
+    Synthesises all compare sections into a single verdict.
     Verdict levels: CLEAR | MONITOR | BACK_TEST_REQUIRED | BLOCK
+
+    Alignment rules (prevent contradictions with I7):
+    - BLOCK only when dataset score < 40 AND the decline is not solely
+      attributable to missingness patterns (pipeline issue vs real degradation).
+    - BACK_TEST_REQUIRED when 3+ columns worsened OR PSI shifts OR target drift.
+    - MONITOR for minor signals only.
+    - CLEAR when nothing significant detected.
     """
     issues = []
     back_test_required = False
@@ -515,9 +516,9 @@ def c0_compare_verdict(c5_result: Optional[Dict], c8_result: Dict,
         issues.append(f"{len(shift_cols)} feature(s) with PSI > 0.25: {', '.join(shift_cols[:5])}"
                       + (" ..." if len(shift_cols) > 5 else ""))
 
-    # Check readiness worsening
+    # Check readiness worsening — tightened from 3 to 2 columns
     for pw in c1_result.get("pairwise", []):
-        if len(pw.get("worsened", [])) >= 3:
+        if len(pw.get("worsened", [])) >= 2:
             back_test_required = True
             issues.append(f"{len(pw['worsened'])} columns degraded in readiness "
                           f"({pw['from']}→{pw['to']})")
@@ -527,12 +528,18 @@ def c0_compare_verdict(c5_result: Optional[Dict], c8_result: Dict,
     if len(ds_scores) >= 2:
         first_s = ds_scores[0]["score"]
         last_s  = ds_scores[-1]["score"]
+        # BLOCK: score below 40 — dataset is genuinely unusable
         if last_s < 40:
             block = True
             issues.append(f"Dataset readiness dropped to {last_s}/100 — not ready for training")
+        # BACK_TEST: score dropped 15+ points — significant degradation
         elif last_s < first_s - 15:
             back_test_required = True
             issues.append(f"Dataset readiness declined {first_s:.0f}→{last_s:.0f} across versions")
+        # MONITOR: score dropped 8–15 points — worth watching
+        elif last_s < first_s - 8:
+            if not back_test_required:
+                issues.append(f"Dataset readiness declined {first_s:.0f}→{last_s:.0f} — monitor")
 
     if block:
         verdict = "BLOCK"
@@ -626,13 +633,17 @@ def c10_cardinality_drift(abts: List[ABTProfile]) -> List[Dict]:
     return results
 
 
-def run_comparison(abts: List[ABTProfile], use_llm: bool = True) -> Dict:
+def run_comparison(abts: List[ABTProfile], use_llm: bool = True, cfg=None) -> Dict:
     """Run all compare sections for N versions."""
     c1 = c1_version_summary(abts)
     c5 = c5_target_drift(abts)
     c8 = c8_psi_matrix(abts)
     c9 = c9_health_score_trend(abts)
     c10 = c10_cardinality_drift(abts)
+    try:
+        drift_suite = compute_column_drift_suite(abts)
+    except Exception:
+        drift_suite = {}
     results = {
         "c0":  c0_compare_verdict(c5, c8, c9, c1),
         "c1":  c1,
@@ -645,7 +656,34 @@ def run_comparison(abts: List[ABTProfile], use_llm: bool = True) -> Dict:
         "c8":  c8,
         "c9":  c9,
         "c10": c10,
+        "drift_suite": drift_suite,
     }
+    # ── Interpretation layer (i4–i9) ────────────────────────────────────────
+    try:
+        from .interpretations import (
+            i4_population_shift,
+            i5_target_stability,
+            i6_feature_drift_impact,
+            i7_model_action,
+            i8_pipeline_break_risks,
+            i9_pipeline_health,
+        )
+        # i5 and i6 must run before i7 — i7 reads their output
+        i5 = i5_target_stability(results["c5"], results["c3"], results["c6"])
+        i6 = i6_feature_drift_impact(results["c3"], results["c4"], results["c8"], drift_suite)
+        i4 = i4_population_shift(results["c1"], results["c4"], results["c9"], drift_suite)
+        i7 = i7_model_action(results["c0"], i5, i6, drift_suite)
+        i8 = i8_pipeline_break_risks(results["c2"], results["c8"], results["c10"], drift_suite)
+        i9 = i9_pipeline_health(results["c3"], results["c6"], results["c9"])
+        results["i4"] = i4
+        results["i5"] = i5
+        results["i6"] = i6
+        results["i7"] = i7
+        results["i8"] = i8
+        results["i9"] = i9
+    except Exception:
+        pass  # interpretation layer is always optional, never breaks existing results
+
     if use_llm:
         try:
             from .llm_insights import enrich_compare

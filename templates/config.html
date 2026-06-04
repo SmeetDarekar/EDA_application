@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+{% block title %}Threshold Configuration{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('home') }}">Home</a> /
+  {% if return_to == 'analyze' %}
+    <a href="{{ url_for('analyze_select') }}">Analyze</a>
+  {% elif return_to == 'compare' %}
+    <a href="{{ url_for('compare_select') }}">Compare</a>
+  {% endif %}
+  / Configuration
+</div>
+
+<div class="page-hdr">
+  <div>
+    <h1>Threshold Configuration</h1>
+    <span class="sub">
+      Tune analysis thresholds to match your dataset's risk profile.
+      Leave any field blank to use the default value.
+    </span>
+  </div>
+  {% if not is_default %}
+  <span class="cfg-active-badge">Custom thresholds active</span>
+  {% endif %}
+</div>
+
+{% if is_default %}
+<div class="cfg-info-banner">
+  <span class="cib-icon">ℹ</span>
+  <div>
+    All thresholds are currently set to <strong>industry defaults</strong> (Basel / credit risk modeling standards).
+    Adjust them only if your dataset or risk appetite differs from these baselines.
+  </div>
+</div>
+{% else %}
+<div class="cfg-info-banner cfg-info-custom">
+  <span class="cib-icon">⚙</span>
+  <div>
+    You have <strong>custom thresholds</strong> active. These will be applied when you run Analyze or Compare.
+    Click <strong>Reset to defaults</strong> to restore standard values.
+  </div>
+</div>
+{% endif %}
+
+<form method="POST" action="{{ url_for('config_save') }}" id="cfg-form">
+  <input type="hidden" name="return_to" value="{{ return_to }}">
+
+  {% for section in meta %}
+  <div class="cfg-section">
+    <div class="cfg-section-hdr">
+      <h2>{{ section.section }}</h2>
+      {% if section.section == 'Column Health Score Weights' %}
+      <span class="cfg-section-note">
+        Weights must sum to 1.0 — they are auto-normalised if they don't.
+        <span id="weight-sum-display" class="weight-sum-ok">Sum: 1.00</span>
+      </span>
+      {% endif %}
+    </div>
+
+    <div class="cfg-fields">
+      {% for f in section.fields %}
+      {% set current = current_values.get(f.key, f.default) %}
+      {% set is_changed = (current | float | round(4)) != (f.default | float | round(4)) %}
+      <div class="cfg-field {% if is_changed %}cfg-field-changed{% endif %}" data-key="{{ f.key }}">
+        <div class="cfg-field-top">
+          <label for="cfg_{{ f.key }}">
+            {{ f.label }}
+            {% if is_changed %}<span class="changed-dot" title="Modified from default">●</span>{% endif %}
+          </label>
+          <div class="cfg-field-controls">
+            <span class="cfg-default-val" title="Default value">default: {{ f.default }}</span>
+            {% if is_changed %}
+            <button type="button" class="btn-reset-field"
+                    onclick="resetField('{{ f.key }}', {{ f.default }})"
+                    title="Reset to default">↺</button>
+            {% endif %}
+          </div>
+        </div>
+        <div class="cfg-input-row">
+          <input
+            type="range"
+            id="range_{{ f.key }}"
+            min="{{ f.min }}" max="{{ f.max }}" step="{{ f.step }}"
+            value="{{ current }}"
+            oninput="syncNumber('{{ f.key }}', this.value)"
+            class="cfg-range {% if 'w_' in f.key %}weight-input{% endif %}"
+          >
+          <input
+            type="number"
+            id="cfg_{{ f.key }}"
+            name="{{ f.key }}"
+            min="{{ f.min }}" max="{{ f.max }}" step="{{ f.step }}"
+            value="{{ current }}"
+            oninput="syncRange('{{ f.key }}', this.value)"
+            class="cfg-number {% if 'w_' in f.key %}weight-input{% endif %}"
+          >
+        </div>
+        <div class="cfg-hint">{{ f.hint }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="cfg-actions">
+    <button type="submit" class="btn-primary">Save &amp; Return →</button>
+    <a href="{{ url_for('config_reset', return_to=return_to) }}" class="btn-sec">↺ Reset to defaults</a>
+    {% if return_to == 'analyze' %}
+    <a href="{{ url_for('analyze_select') }}" class="btn-sec">Cancel</a>
+    {% elif return_to == 'compare' %}
+    <a href="{{ url_for('compare_select') }}" class="btn-sec">Cancel</a>
+    {% else %}
+    <a href="{{ url_for('home') }}" class="btn-sec">Cancel</a>
+    {% endif %}
+  </div>
+</form>
+
+<style>
+/* ── Config page styles ───────────────────────────────────────────── */
+.cfg-info-banner {
+  display: flex;
+  gap: .875rem;
+  align-items: flex-start;
+  background: rgba(59,130,246,.06);
+  border: 1px solid rgba(59,130,246,.2);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: .875rem 1.1rem;
+  margin-bottom: 1.5rem;
+  font-size: .85rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.cfg-info-custom {
+  background: rgba(245,158,11,.05);
+  border-color: rgba(245,158,11,.25);
+  border-left-color: var(--amber);
+  color: var(--text);
+}
+.cib-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+
+.cfg-active-badge {
+  font-size: .72rem;
+  font-weight: 700;
+  padding: .3rem .8rem;
+  border-radius: 99px;
+  background: var(--amber-dim);
+  color: var(--amber);
+  align-self: center;
+  white-space: nowrap;
+}
+
+/* ── Sections ─────────────────────────────────────────────────────── */
+.cfg-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.cfg-section-hdr {
+  padding: .875rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.cfg-section-hdr h2 {
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.cfg-section-note {
+  font-size: .75rem;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* ── Fields grid ──────────────────────────────────────────────────── */
+.cfg-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 0;
+}
+.cfg-field {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  transition: background .15s;
+}
+.cfg-field:hover { background: rgba(255,255,255,.015); }
+.cfg-field-changed {
+  background: rgba(245,158,11,.04);
+  border-left: 2px solid var(--amber);
+}
+.cfg-field-changed:hover { background: rgba(245,158,11,.07); }
+
+.cfg-field-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: .5rem;
+  gap: .5rem;
+}
+.cfg-field-top label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.changed-dot {
+  color: var(--amber);
+  font-size: .55rem;
+  vertical-align: super;
+  margin-left: .25rem;
+}
+.cfg-field-controls {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  flex-shrink: 0;
+}
+.cfg-default-val {
+  font-size: .68rem;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.btn-reset-field {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  border-radius: 4px;
+  padding: .1rem .35rem;
+  font-size: .75rem;
+  cursor: pointer;
+  line-height: 1.4;
+  transition: .15s;
+}
+.btn-reset-field:hover { color: var(--text); border-color: var(--text3); }
+
+/* ── Input row: slider + number ───────────────────────────────────── */
+.cfg-input-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .4rem;
+}
+.cfg-range {
+  flex: 1;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg3);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--blue);
+}
+.cfg-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+  border: 2px solid var(--bg2);
+  box-shadow: 0 0 0 1px var(--blue);
+  transition: transform .1s;
+}
+.cfg-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+.cfg-number {
+  width: 80px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 6px;
+  padding: .35rem .5rem;
+  font-size: .8rem;
+  font-family: var(--font-mono);
+  text-align: right;
+  transition: border-color .15s;
+  flex-shrink: 0;
+}
+.cfg-number:focus { outline: none; border-color: var(--blue); }
+
+.cfg-hint {
+  font-size: .73rem;
+  color: var(--text3);
+  line-height: 1.55;
+}
+
+/* ── Weight sum display ───────────────────────────────────────────── */
+.weight-sum-ok  { color: var(--green); font-family: var(--font-mono); font-weight: 600; }
+.weight-sum-bad { color: var(--red);   font-family: var(--font-mono); font-weight: 600; }
+
+/* ── Actions ──────────────────────────────────────────────────────── */
+.cfg-actions {
+  display: flex;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  padding-bottom: 2rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .cfg-fields { grid-template-columns: 1fr; }
+  .cfg-number { width: 70px; }
+}
+</style>
+
+<script>
+function syncNumber(key, val) {
+  document.getElementById('cfg_' + key).value = val;
+  updateWeightSum();
+  markChanged(key, val);
+}
+function syncRange(key, val) {
+  document.getElementById('range_' + key).value = val;
+  updateWeightSum();
+  markChanged(key, val);
+}
+function resetField(key, defaultVal) {
+  document.getElementById('cfg_' + key).value = defaultVal;
+  document.getElementById('range_' + key).value = defaultVal;
+  const field = document.querySelector('[data-key="' + key + '"]');
+  if (field) {
+    field.classList.remove('cfg-field-changed');
+  }
+  updateWeightSum();
+}
+
+function markChanged(key, val) {
+  // We can't easily know the original default in JS without embedding it,
+  // so we rely on server-side rendering for the initial state.
+  // Visual feedback is handled by CSS on page load.
+}
+
+function updateWeightSum() {
+  const weightKeys = ['w_completeness', 'w_variance', 'w_mismatch', 'w_governance', 'w_distribution'];
+  let sum = 0;
+  weightKeys.forEach(k => {
+    const el = document.getElementById('cfg_' + k);
+    if (el) sum += parseFloat(el.value) || 0;
+  });
+  const display = document.getElementById('weight-sum-display');
+  if (!display) return;
+  display.textContent = 'Sum: ' + sum.toFixed(2);
+  display.className = Math.abs(sum - 1.0) < 0.02 ? 'weight-sum-ok' : 'weight-sum-bad';
+}
+
+// Initialise weight sum on load
+document.addEventListener('DOMContentLoaded', updateWeightSum);
+</script>
+{% endblock %}
