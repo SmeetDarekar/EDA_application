@@ -12,7 +12,7 @@ from typing import Optional, Dict, Any
 # ── Configuration ─────────────────────────────────────────────────────────────
 # Set these via environment variables in production.
 
-IC_BASE_URL    = ""
+IC_BASE_URL    = "BASE_URL"
 IC_ACCESS_TOKEN = ""
 IC_INSTANCES_ENDPOINT = f"{IC_BASE_URL}/catalog/instances"
 

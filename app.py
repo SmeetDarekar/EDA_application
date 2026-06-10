@@ -394,6 +394,115 @@ def api_ingest():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+    """
+ADD THESE TWO ROUTES TO app.py
+─────────────────────────────────────────────────────────────────────────────
+Paste both routes into app.py after the existing compare_run route.
+Also add this import at the top of app.py:
+
+    from abt.business_insights import build_business_insights
+
+─────────────────────────────────────────────────────────────────────────────
+"""
+
+# ── Route 1: GET version of compare/run (needed for decision view back-link)
+@app.route("/compare/run", methods=["GET"])
+def compare_run_get():
+    """
+    Re-runs comparison from query params.
+    Used by decision_view.html back-link and stage switcher.
+    """
+    table_name = request.args.get("table_name", "").strip()
+    ver_list   = request.args.getlist("versions")
+
+    if not table_name or len(ver_list) < 2:
+        return redirect(url_for("compare_select"))
+
+    try:
+        abts    = [load_abt(table_name, int(v)) for v in ver_list]
+        use_llm = False   # GET re-runs skip LLM to stay fast
+        results = run_comparison(abts, use_llm=use_llm)
+        return render_template("compare_results.html", abts=abts, r=results,
+                               version_labels=[a.abt_name for a in abts])
+    except FileNotFoundError as e:
+        return render_template("error.html", message=str(e))
+    except Exception as e:
+        import traceback
+        return render_template("error.html",
+                               message=f"Comparison failed: {e}<br><pre>{traceback.format_exc()}</pre>")
+
+
+# ── Route 2: Decision view — 5-insight business layer
+@app.route("/compare/decision", methods=["GET", "POST"])
+def decision_view():
+    """
+    Decision Intelligence view.
+    POST: called from compare_run when user clicks 'Decision View'.
+    GET:  called from stage selector inside the decision view itself.
+    """
+    from abt.business_insights import build_business_insights
+
+    if request.method == "POST":
+        table_name = request.form.get("table_name", "").strip()
+        ver_list   = request.form.getlist("versions")
+        stage      = request.form.get("stage", "back_testing")
+    else:
+        table_name = request.args.get("table_name", "").strip()
+        ver_list   = request.args.getlist("versions")
+        stage      = request.args.get("stage", "back_testing")
+
+    if not table_name or len(ver_list) < 2:
+        tables   = list_tables()
+        versions = get_table_versions(table_name) or []
+        return render_template("compare_select.html", tables=tables,
+                               selected_table=table_name, versions=versions,
+                               error="Select at least 2 versions.")
+
+    try:
+        abts    = [load_abt(table_name, int(v)) for v in ver_list]
+        use_llm = request.form.get("use_llm") == "on" if request.method == "POST" else False
+        results = run_comparison(abts, use_llm=use_llm)
+
+        # Build business insights on top of existing results
+        insights = build_business_insights(results, stage=stage)
+
+        # Overall decision + message pulled from i7 (already computed)
+        i7 = results.get("i7", {})
+        overall_decision = i7.get("decision", results.get("c0", {}).get("verdict", "MONITOR"))
+        overall_message  = i7.get("reason",   results.get("c0", {}).get("message", ""))
+
+        # Map decision to CSS class for verdict banner
+        verdict_css_map = {
+            "retrain":     "back-test-required",
+            "rebin":       "monitor",
+            "recalibrate": "monitor",
+            "hold":        "clear",
+            "CLEAR":       "clear",
+            "MONITOR":     "monitor",
+            "BACK_TEST_REQUIRED": "back-test-required",
+            "BLOCK":       "block",
+        }
+        verdict_css = verdict_css_map.get(overall_decision, "monitor")
+
+        return render_template(
+            "decision_view.html",
+            insights         = insights,
+            version_labels   = [a.abt_name for a in abts],
+            table_name       = table_name,
+            raw_versions     = ver_list,
+            stage            = stage,
+            overall_decision = overall_decision,
+            overall_message  = overall_message,
+            verdict_css      = verdict_css,
+        )
+
+    except FileNotFoundError as e:
+        return render_template("error.html", message=str(e))
+    except Exception as e:
+        import traceback
+        return render_template("error.html",
+                               message=f"Decision view failed: {e}<br><pre>{traceback.format_exc()}</pre>")
 
 
 if __name__ == "__main__":

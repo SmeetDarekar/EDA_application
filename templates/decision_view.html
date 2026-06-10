@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Decision View — {{ version_labels | join(' vs ') }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{{ url_for('home') }}">Home</a> /
+  <a href="{{ url_for('compare_select') }}">Compare</a> /
+  <a href="{{ url_for('compare_run_get', table_name=table_name, versions=raw_versions) }}">{{ version_labels | join(' → ') }}</a> /
+  Decision View
+</div>
+
+{# ── Header ── #}
+<div class="page-hdr" style="margin-bottom:1rem;">
+  <div>
+    <h1>Decision Intelligence</h1>
+    <span class="sub">{{ version_labels[0] }} (baseline) → {{ version_labels[-1] }} (current)</span>
+  </div>
+
+  {# Stage selector #}
+  <form method="GET" action="{{ url_for('decision_view') }}" style="display:flex;align-items:center;gap:.5rem;">
+    <input type="hidden" name="table_name" value="{{ table_name }}">
+    {% for v in raw_versions %}
+    <input type="hidden" name="versions" value="{{ v }}">
+    {% endfor %}
+    <label style="font-size:.8rem;color:var(--text2);font-weight:600;">Stage:</label>
+    <select name="stage" onchange="this.form.submit()"
+            style="background:var(--bg2);border:1px solid var(--border);color:var(--text);
+                   border-radius:6px;padding:.35rem .75rem;font-size:.82rem;font-family:inherit;">
+      <option value="development"    {% if stage=='development'    %}selected{% endif %}>Development</option>
+      <option value="back_testing"   {% if stage=='back_testing'   %}selected{% endif %}>Back Testing</option>
+      <option value="pre_deployment" {% if stage=='pre_deployment' %}selected{% endif %}>Pre-Deployment</option>
+      <option value="production"     {% if stage=='production'     %}selected{% endif %}>Production</option>
+    </select>
+  </form>
+</div>
+
+{# ── Overall action banner ── #}
+{% if overall_decision %}
+<div class="verdict-banner verdict-{{ verdict_css }}" style="margin-bottom:1.25rem;">
+  <div class="vb-left">
+    <div class="vb-verdict" style="font-size:1.1rem;">
+      {{ overall_decision | replace('_',' ') | upper }}
+    </div>
+    <div class="vb-msg" style="font-size:.9rem;">{{ overall_message }}</div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Link to full analysis ── #}
+<div style="text-align:right;margin-bottom:1.25rem;">
+  <a href="{{ url_for('compare_run_get', table_name=table_name, versions=raw_versions) }}"
+     class="btn-sec" style="font-size:.8rem;">
+    View full technical analysis →
+  </a>
+</div>
+
+{# ── 5 Insight Cards ── #}
+{% for insight in insights %}
+{% set sev = insight.severity %}
+
+<div class="section-card" style="margin-bottom:1rem;border-left:4px solid
+  {% if sev == 'critical' %}var(--red)
+  {% elif sev == 'warning' %}var(--amber)
+  {% elif sev == 'info'    %}var(--blue)
+  {% else                  %}var(--green)
+  {% endif %};">
+
+  {# Card header — always visible #}
+  <div style="padding:1rem 1.25rem 0;">
+    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;
+                   letter-spacing:.07em;color:var(--text3);">
+        {{ loop.index }}
+      </span>
+      <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                   letter-spacing:.05em;color:
+        {% if sev == 'critical' %}var(--red)
+        {% elif sev == 'warning' %}var(--amber)
+        {% elif sev == 'info'    %}var(--blue)
+        {% else                  %}var(--green)
+        {% endif %};">
+        {{ insight.title }}
+      </span>
+      <span class="sec-badge
+        {% if sev == 'critical' %}badge-red
+        {% elif sev == 'warning' %}badge-amber
+        {% elif sev == 'info'    %}badge-blue
+        {% else                  %}badge-green
+        {% endif %}">
+        {{ sev }}
+      </span>
+    </div>
+
+    {# Headline — Layer 1 #}
+    <p style="font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:.75rem;">
+      {{ insight.headline }}
+    </p>
+  </div>
+
+  {# See more — Layer 2 + Layer 3 #}
+  <details style="border-top:1px solid var(--border);">
+    <summary style="padding:.6rem 1.25rem;font-size:.78rem;font-weight:600;
+                    color:var(--text2);cursor:pointer;user-select:none;
+                    display:flex;align-items:center;gap:.4rem;list-style:none;">
+      <span style="font-size:.6rem;color:var(--text3);transition:transform .15s;"
+            class="see-more-arrow">▶</span>
+      See more
+    </summary>
+
+    <div style="padding:.75rem 1.25rem 1.25rem;">
+
+      {# Layer 2: Evidence #}
+      {% if insight.evidence %}
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.06em;color:var(--text3);margin-bottom:.5rem;">
+          Evidence
+        </div>
+        {% for ev in insight.evidence %}
+        <div style="padding:.5rem .75rem;background:var(--bg3);border-radius:6px;
+                    margin-bottom:.4rem;
+                    border-left:2px solid
+          {% if sev == 'critical' %}var(--red)
+          {% elif sev == 'warning' %}var(--amber)
+          {% elif sev == 'info'    %}var(--blue)
+          {% else                  %}var(--green)
+          {% endif %};">
+          <div style="font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.2rem;">
+            {{ ev.label }}
+          </div>
+          <div style="font-size:.78rem;color:var(--text2);line-height:1.55;">
+            {{ ev.detail }}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {# Layer 3: Impact and action #}
+      {% if insight.impact_and_action %}
+      <div style="margin-bottom:{% if insight.llm_narrative %}1rem{% else %}0{% endif %};">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.06em;color:var(--text3);margin-bottom:.5rem;">
+          Impact &amp; Recommended Action
+        </div>
+        <div style="padding:.75rem 1rem;border-radius:6px;font-size:.83rem;
+                    color:var(--text);line-height:1.65;
+                    background:
+          {% if sev == 'critical' %}rgba(239,68,68,.05)
+          {% elif sev == 'warning' %}rgba(245,158,11,.04)
+          {% elif sev == 'info'    %}rgba(59,130,246,.04)
+          {% else                  %}rgba(34,197,94,.04)
+          {% endif %};
+                    border:1px solid
+          {% if sev == 'critical' %}var(--red-dim)
+          {% elif sev == 'warning' %}var(--amber-dim)
+          {% elif sev == 'info'    %}var(--blue-dim)
+          {% else                  %}var(--green-dim)
+          {% endif %};">
+          {{ insight.impact_and_action }}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Layer 3 addition: LLM narrative if available #}
+      {% if insight.llm_narrative %}
+      <div>
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
+                    letter-spacing:.06em;color:var(--blue);margin-bottom:.5rem;">
+          AI Narrative
+        </div>
+        <div class="narrative-card" style="margin:0;">
+          <div class="nc-text">{{ insight.llm_narrative }}</div>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </details>
+</div>
+{% endfor %}
+
+<script>
+// Rotate arrow on expand
+document.querySelectorAll('details').forEach(d => {
+  d.addEventListener('toggle', () => {
+    const arrow = d.querySelector('.see-more-arrow');
+    if (arrow) arrow.style.transform = d.open ? 'rotate(90deg)' : '';
+  });
+});
+</script>
+
+{% endblock %}
