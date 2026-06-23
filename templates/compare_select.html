@@ -44,7 +44,7 @@
     </div>
   </form>
 
-  {# Step 2: choose versions (only shown after table selected) #}
+  {# Step 2: choose versions + context (only shown after table selected) #}
   {% if versions %}
   <form method="POST" action="{{ url_for('compare_run') }}" style="margin-top:1.5rem">
     <input type="hidden" name="table_name" value="{{ selected_table }}">
@@ -63,7 +63,46 @@
         {% endfor %}
       </select>
     </div>
-    <div class="form-actions">
+
+    {# ── Model context — drives LLM insight framing ── #}
+    <div class="context-panel">
+      <div class="cp-label">
+        Model Context
+        <span class="optional">— used to frame AI insights for your domain</span>
+      </div>
+      <div class="form-row two-col">
+        <div class="form-group" style="margin-bottom:0">
+          <label for="domain">Business Domain</label>
+          <select name="domain" id="domain">
+            <option value="credit_risk"      {% if selected_domain == 'credit_risk'      or not selected_domain %}selected{% endif %}>Credit Risk</option>
+            <option value="fraud"            {% if selected_domain == 'fraud'            %}selected{% endif %}>Fraud Detection</option>
+            <option value="churn"            {% if selected_domain == 'churn'            %}selected{% endif %}>Customer Churn</option>
+            <option value="marketing"        {% if selected_domain == 'marketing'        %}selected{% endif %}>Marketing Propensity</option>
+            <option value="insurance"        {% if selected_domain == 'insurance'        %}selected{% endif %}>Insurance Underwriting</option>
+            <option value="collections"      {% if selected_domain == 'collections'      %}selected{% endif %}>Collections Scoring</option>
+            <option value="operational_risk" {% if selected_domain == 'operational_risk' %}selected{% endif %}>Operational Risk</option>
+            <option value="other"            {% if selected_domain == 'other'            %}selected{% endif %}>Other</option>
+          </select>
+          <span class="hint">Determines business language used in AI summaries.</span>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label for="abt_purpose">Model Purpose</label>
+          <select name="abt_purpose" id="abt_purpose">
+            <option value="pd"           {% if selected_purpose == 'pd'           or not selected_purpose %}selected{% endif %}>Probability of Default (PD)</option>
+            <option value="lgd"          {% if selected_purpose == 'lgd'          %}selected{% endif %}>Loss Given Default (LGD)</option>
+            <option value="ead"          {% if selected_purpose == 'ead'          %}selected{% endif %}>Exposure at Default (EAD)</option>
+            <option value="fraud"        {% if selected_purpose == 'fraud'        %}selected{% endif %}>Fraud Detection</option>
+            <option value="churn"        {% if selected_purpose == 'churn'        %}selected{% endif %}>Churn Prediction</option>
+            <option value="propensity"   {% if selected_purpose == 'propensity'   %}selected{% endif %}>Propensity Scoring</option>
+            <option value="segmentation" {% if selected_purpose == 'segmentation' %}selected{% endif %}>Customer Segmentation</option>
+            <option value="other"        {% if selected_purpose == 'other'        %}selected{% endif %}>Other</option>
+          </select>
+          <span class="hint">Prioritises signals most relevant to this model type.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions" style="margin-top:1.25rem">
       <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
         <input type="checkbox" name="use_llm" id="use_llm" style="width:auto">
         <label for="use_llm" style="margin:0;font-weight:400;">
@@ -117,5 +156,23 @@
 }
 .cfg-active-strip a { color: var(--blue); }
 .cas-icon { font-size: .95rem; }
+
+/* Model context panel */
+.context-panel {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  background: rgba(59,130,246,.03);
+}
+.cp-label {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--blue);
+  margin-bottom: .875rem;
+}
 </style>
 {% endblock %}

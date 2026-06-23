@@ -66,7 +66,7 @@ PROVIDERS = {
         # "api_url":  os.environ.get("AZURE_OPENAI_ENDPOINT", ""),
         # "api_key":  os.environ.get("AZURE_OPENAI_KEY", ""),
         # "model":    os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
-        "api_url":  "https://rm-vpn.cognitiveservices.azure.com/%22",
+        "api_url":  "",
         "api_key":  "", 
         "model":    "gpt-4.1",
         "headers":  lambda key: {
