@@ -431,10 +431,10 @@
     {% for a in abts %}
     <input type="hidden" name="versions" value="{{ a.version }}">
     {% endfor %}
-    <input type="hidden" name="stage" value="back_testing">
-    {% if r.get('version_story') %}
-    <input type="hidden" name="use_llm" value="on">
-    {% endif %}
+    <input type="hidden" name="stage"       value="{{ r.get('stage', 'back_testing') }}">
+    <input type="hidden" name="domain"      value="{{ r.get('domain', 'credit_risk') }}">
+    <input type="hidden" name="abt_purpose" value="{{ r.get('abt_purpose', 'pd') }}">
+    <input type="hidden" name="use_llm"     value="on">
     <button type="submit" class="btn-primary" style="display:flex;align-items:center;gap:.4rem;">
       ✦ Decision View
     </button>

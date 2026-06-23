@@ -5,20 +5,23 @@
 <div class="breadcrumb">
   <a href="{{ url_for('home') }}">Home</a> /
   <a href="{{ url_for('compare_select') }}">Compare</a> /
-  <a href="{{ url_for('compare_run_get', table_name=table_name, versions=raw_versions) }}">{{ version_labels | join(' → ') }}</a> /
   Decision View
 </div>
 
-{# ── Header ── #}
+{# ── Header + Stage selector ── #}
 <div class="page-hdr" style="margin-bottom:1rem;">
   <div>
     <h1>Decision Intelligence</h1>
-    <span class="sub">{{ version_labels[0] }} (baseline) → {{ version_labels[-1] }} (current)</span>
+    <span class="sub">
+      {{ version_labels[0] }} (baseline) → {{ version_labels[-1] }} (current)
+    </span>
   </div>
 
-  {# Stage selector #}
-  <form method="GET" action="{{ url_for('decision_view') }}" style="display:flex;align-items:center;gap:.5rem;">
-    <input type="hidden" name="table_name" value="{{ table_name }}">
+  <form method="GET" action="{{ url_for('decision_view') }}"
+        style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+    <input type="hidden" name="table_name"  value="{{ table_name }}">
+    <input type="hidden" name="domain"      value="{{ domain }}">
+    <input type="hidden" name="abt_purpose" value="{{ abt_purpose }}">
     {% for v in raw_versions %}
     <input type="hidden" name="versions" value="{{ v }}">
     {% endfor %}
@@ -34,7 +37,7 @@
   </form>
 </div>
 
-{# ── Overall action banner ── #}
+{# ── Overall verdict banner ── #}
 {% if overall_decision %}
 <div class="verdict-banner verdict-{{ verdict_css }}" style="margin-bottom:1.25rem;">
   <div class="vb-left">
@@ -46,64 +49,72 @@
 </div>
 {% endif %}
 
-{# ── Link to full analysis ── #}
+{# ── Back-link to full technical analysis ── #}
 <div style="text-align:right;margin-bottom:1.25rem;">
-  <a href="{{ url_for('compare_run_get', table_name=table_name, versions=raw_versions) }}"
-     class="btn-sec" style="font-size:.8rem;">
-    View full technical analysis →
-  </a>
+  <form method="POST" action="{{ url_for('compare_run') }}" style="display:inline;">
+    <input type="hidden" name="table_name"  value="{{ table_name }}">
+    <input type="hidden" name="domain"      value="{{ domain }}">
+    <input type="hidden" name="abt_purpose" value="{{ abt_purpose }}">
+    {% for v in raw_versions %}
+    <input type="hidden" name="versions" value="{{ v }}">
+    {% endfor %}
+    <button type="submit" class="btn-sec" style="font-size:.8rem;">
+      View full technical analysis →
+    </button>
+  </form>
 </div>
 
-{# ── 5 Insight Cards ── #}
+{# ══════════════════════════════════════════════════════════
+   PHASE 1 — 7 BUSINESS INSIGHT CARDS
+   Built by build_business_insights() — rule-based, always present.
+══════════════════════════════════════════════════════════ #}
 {% for insight in insights %}
 {% set sev = insight.severity %}
 
-<div class="section-card" style="margin-bottom:1rem;border-left:4px solid
-  {% if sev == 'critical' %}var(--red)
-  {% elif sev == 'warning' %}var(--amber)
-  {% elif sev == 'info'    %}var(--blue)
-  {% else                  %}var(--green)
-  {% endif %};">
+{% if sev == 'critical' %}
+  {% set border_color = 'var(--red)' %}
+  {% set badge_class  = 'badge-red' %}
+{% elif sev == 'warning' %}
+  {% set border_color = 'var(--amber)' %}
+  {% set badge_class  = 'badge-amber' %}
+{% else %}
+  {% set border_color = 'var(--green)' %}
+  {% set badge_class  = 'badge-green' %}
+{% endif %}
 
-  {# Card header — always visible #}
+<div style="background:var(--bg2);border:1px solid var(--border);
+            border-left:4px solid {{ border_color }};
+            border-radius:var(--radius);margin-bottom:1rem;overflow:hidden;">
+
+  {# Layer 1: Headline (always visible) #}
   <div style="padding:1rem 1.25rem 0;">
-    <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap;">
-      <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;
-                   letter-spacing:.07em;color:var(--text3);">
+    <div style="display:flex;align-items:center;gap:.6rem;
+                margin-bottom:.5rem;flex-wrap:wrap;">
+      <span style="font-size:.68rem;font-weight:700;color:var(--text3);">
         {{ loop.index }}
       </span>
       <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;
-                   letter-spacing:.05em;color:
-        {% if sev == 'critical' %}var(--red)
-        {% elif sev == 'warning' %}var(--amber)
-        {% elif sev == 'info'    %}var(--blue)
-        {% else                  %}var(--green)
-        {% endif %};">
+                   letter-spacing:.05em;color:{{ border_color }};">
         {{ insight.title }}
       </span>
-      <span class="sec-badge
-        {% if sev == 'critical' %}badge-red
-        {% elif sev == 'warning' %}badge-amber
-        {% elif sev == 'info'    %}badge-blue
-        {% else                  %}badge-green
-        {% endif %}">
-        {{ sev }}
-      </span>
+      <span class="sec-badge {{ badge_class }}">{{ sev }}</span>
+      {% if insight.slot.startswith('drift_story') and sev != 'stable' %}
+      <span class="sec-badge badge-purple">drift finding</span>
+      {% endif %}
     </div>
-
-    {# Headline — Layer 1 #}
-    <p style="font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:.75rem;">
+    <p style="font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:.875rem;">
       {{ insight.headline }}
     </p>
   </div>
 
-  {# See more — Layer 2 + Layer 3 #}
+  {# See more: Layer 2 + Layer 3 #}
+  {% if insight.evidence or insight.impact_and_action or insight.llm_narrative %}
   <details style="border-top:1px solid var(--border);">
     <summary style="padding:.6rem 1.25rem;font-size:.78rem;font-weight:600;
                     color:var(--text2);cursor:pointer;user-select:none;
-                    display:flex;align-items:center;gap:.4rem;list-style:none;">
-      <span style="font-size:.6rem;color:var(--text3);transition:transform .15s;"
-            class="see-more-arrow">▶</span>
+                    list-style:none;display:flex;align-items:center;gap:.4rem;">
+      <span class="dm-arrow"
+            style="font-size:.6rem;color:var(--text3);transition:transform .15s;">▶</span>
       See more
     </summary>
 
@@ -118,13 +129,7 @@
         </div>
         {% for ev in insight.evidence %}
         <div style="padding:.5rem .75rem;background:var(--bg3);border-radius:6px;
-                    margin-bottom:.4rem;
-                    border-left:2px solid
-          {% if sev == 'critical' %}var(--red)
-          {% elif sev == 'warning' %}var(--amber)
-          {% elif sev == 'info'    %}var(--blue)
-          {% else                  %}var(--green)
-          {% endif %};">
+                    margin-bottom:.4rem;border-left:2px solid {{ border_color }};">
           <div style="font-size:.76rem;font-weight:600;color:var(--text);margin-bottom:.2rem;">
             {{ ev.label }}
           </div>
@@ -144,25 +149,22 @@
           Impact &amp; Recommended Action
         </div>
         <div style="padding:.75rem 1rem;border-radius:6px;font-size:.83rem;
-                    color:var(--text);line-height:1.65;
-                    background:
-          {% if sev == 'critical' %}rgba(239,68,68,.05)
-          {% elif sev == 'warning' %}rgba(245,158,11,.04)
-          {% elif sev == 'info'    %}rgba(59,130,246,.04)
-          {% else                  %}rgba(34,197,94,.04)
-          {% endif %};
-                    border:1px solid
-          {% if sev == 'critical' %}var(--red-dim)
-          {% elif sev == 'warning' %}var(--amber-dim)
-          {% elif sev == 'info'    %}var(--blue-dim)
-          {% else                  %}var(--green-dim)
-          {% endif %};">
+                    color:var(--text);line-height:1.65;border:1px solid var(--border);
+                    {% if sev == 'critical' %}background:rgba(239,68,68,.04);
+                    {% elif sev == 'warning' %}background:rgba(245,158,11,.04);
+                    {% else %}background:rgba(34,197,94,.04);{% endif %}">
           {{ insight.impact_and_action }}
         </div>
+        {% if insight.validation_note is defined and insight.validation_note %}
+        <div style="font-size:.7rem;color:var(--text3);margin-top:.35rem;
+                    padding:.3rem .6rem;background:var(--bg3);border-radius:4px;">
+          ⚠ Validator: {{ insight.validation_note.split('|')[0].strip() }}
+        </div>
+        {% endif %}
       </div>
       {% endif %}
 
-      {# Layer 3 addition: LLM narrative if available #}
+      {# Layer 3 addition: LLM narrative #}
       {% if insight.llm_narrative %}
       <div>
         <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
@@ -177,14 +179,208 @@
 
     </div>
   </details>
+  {% endif %}
+
 </div>
 {% endfor %}
 
+{% if not insights %}
+<div class="empty-state" style="padding:2rem;text-align:center;">
+  No insights available. Run a comparison first.
+</div>
+{% endif %}
+
+
+{# ══════════════════════════════════════════════════════════
+   PHASE 2 — AI-RANKED DRIFT INSIGHT CARDS
+   Built by synthesise_drift_insights_v2() via 3-call LLM chain.
+   Each card's evidence contains actual computed numbers.
+   Rendered at the bottom, after all Phase 1 cards.
+   Never shown if drift_insights is absent or has no cards.
+══════════════════════════════════════════════════════════ #}
+{% if r and r.drift_insights and r.drift_insights.cards %}
+{% set di = r.drift_insights %}
+
+<div style="margin-top:2.5rem;padding-top:1.75rem;border-top:2px solid var(--border);">
+
+  {# Section header #}
+  <div style="display:flex;align-items:baseline;justify-content:space-between;
+              flex-wrap:wrap;gap:.5rem;margin-bottom:1.1rem;">
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+      <span style="font-size:1rem;font-weight:700;color:var(--text);">
+        AI Drift Signals
+      </span>
+      <span style="font-size:.75rem;color:var(--text3);
+                   background:var(--bg3);border:1px solid var(--border);
+                   border-radius:99px;padding:.15rem .65rem;">
+        {{ di.domain_label | default('') }} · {{ di.purpose_label | default('') }}
+      </span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem;">
+      {% if di.llm_used %}
+      <span style="font-size:.7rem;font-weight:600;padding:.2rem .6rem;border-radius:99px;
+                   background:rgba(168,85,247,.12);color:#a855f7;
+                   border:1px solid rgba(168,85,247,.25);">
+        ✦ AI-ranked · 3-call chain
+      </span>
+      {% else %}
+      <span style="font-size:.7rem;font-weight:600;padding:.2rem .6rem;border-radius:99px;
+                   background:var(--bg3);color:var(--text3);border:1px solid var(--border);">
+        Rule-based fallback
+      </span>
+      {% endif %}
+      <span style="font-size:.75rem;color:var(--text3);">
+        {{ di.cards | length }} signal{{ 's' if di.cards|length != 1 }}
+      </span>
+    </div>
+  </div>
+
+  {# Meta narrative — one sentence linking all cards #}
+  {% if di.meta_narrative %}
+  <div style="padding:.75rem 1rem;border-radius:var(--radius);
+              background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.2);
+              border-left:3px solid var(--blue);
+              font-size:.85rem;color:var(--text2);line-height:1.65;
+              margin-bottom:1.25rem;">
+    <span style="font-size:.68rem;font-weight:700;text-transform:uppercase;
+                 letter-spacing:.06em;color:var(--blue);display:block;margin-bottom:.3rem;">
+      Portfolio narrative
+    </span>
+    {{ di.meta_narrative }}
+  </div>
+  {% endif %}
+
+  {# Cards #}
+  {% for card in di.cards %}
+
+  {# Severity → colour mapping #}
+  {% if card.severity == 'critical' %}
+    {% set di_border = 'var(--red)' %}
+    {% set di_bg     = 'rgba(239,68,68,.04)' %}
+    {% set di_badge  = 'badge-red' %}
+    {% set di_label  = 'Critical' %}
+  {% elif card.severity == 'high' %}
+    {% set di_border = 'var(--amber)' %}
+    {% set di_bg     = 'rgba(245,158,11,.04)' %}
+    {% set di_badge  = 'badge-amber' %}
+    {% set di_label  = 'High' %}
+  {% elif card.severity == 'medium' %}
+    {% set di_border = 'var(--blue)' %}
+    {% set di_bg     = 'rgba(59,130,246,.04)' %}
+    {% set di_badge  = 'badge-blue' %}
+    {% set di_label  = 'Medium' %}
+  {% else %}
+    {% set di_border = 'var(--green)' %}
+    {% set di_bg     = 'rgba(34,197,94,.04)' %}
+    {% set di_badge  = 'badge-green' %}
+    {% set di_label  = 'Low' %}
+  {% endif %}
+
+  {# Domain icon #}
+  {% if card.domain == 'target' %}       {% set di_icon = '🎯' %}
+  {% elif card.domain == 'feature' %}    {% set di_icon = '📊' %}
+  {% elif card.domain == 'pipeline' %}   {% set di_icon = '🔧' %}
+  {% elif card.domain == 'governance' %} {% set di_icon = '🔒' %}
+  {% else %}                             {% set di_icon = '👥' %}
+  {% endif %}
+
+  <div style="background:var(--bg2);border:1px solid var(--border);
+              border-left:4px solid {{ di_border }};
+              border-radius:var(--radius);margin-bottom:1rem;overflow:hidden;">
+
+    {# Layer 1: Headline — always visible, pure business language #}
+    <div style="padding:1rem 1.25rem 0;">
+      <div style="display:flex;align-items:center;gap:.6rem;
+                  margin-bottom:.5rem;flex-wrap:wrap;">
+        <span style="font-size:.68rem;font-weight:700;color:var(--text3);">
+          {{ card.rank }}
+        </span>
+        <span style="font-size:.9rem;">{{ di_icon }}</span>
+        <span style="font-size:.75rem;font-weight:700;text-transform:uppercase;
+                     letter-spacing:.05em;color:{{ di_border }};">
+          {{ card.domain }}
+        </span>
+        <span class="sec-badge {{ di_badge }}">{{ di_label }}</span>
+        {% if card.columns %}
+        <span style="font-size:.7rem;color:var(--text3);">
+          {{ card.columns | join(', ') }}
+        </span>
+        {% endif %}
+      </div>
+      {# Triage reason from Call 1 — shown when available #}
+      {% if card.triage_reason is defined and card.triage_reason %}
+      <div style="font-size:.73rem;color:var(--text3);font-style:italic;
+                  margin-bottom:.4rem;">
+        {{ card.triage_reason }}
+      </div>
+      {% endif %}
+      <p style="font-size:.9rem;color:var(--text);line-height:1.7;margin-bottom:.875rem;">
+        {{ card.headline }}
+      </p>
+    </div>
+
+    {# Layer 2 + 3: See more #}
+    <details style="border-top:1px solid var(--border);">
+      <summary style="padding:.6rem 1.25rem;font-size:.78rem;font-weight:600;
+                      color:var(--text2);cursor:pointer;user-select:none;
+                      list-style:none;display:flex;align-items:center;gap:.4rem;">
+        <span class="dm-arrow"
+              style="font-size:.6rem;color:var(--text3);transition:transform .15s;">▶</span>
+        See more
+      </summary>
+
+      <div style="padding:.75rem 1.25rem 1.25rem;">
+
+        {# Layer 2: Evidence — contains actual computed numbers #}
+        <div style="margin-bottom:1rem;">
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.06em;color:var(--text3);margin-bottom:.5rem;">
+            Evidence
+          </div>
+          <div style="padding:.6rem .875rem;background:var(--bg3);border-radius:6px;
+                      border-left:2px solid {{ di_border }};">
+            <div style="font-size:.8rem;color:var(--text2);line-height:1.6;">
+              {{ card.evidence }}
+            </div>
+          </div>
+        </div>
+
+        {# Layer 3: Action — locked to I7 decision #}
+        <div>
+          <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.06em;color:var(--text3);margin-bottom:.5rem;">
+            Recommended Action
+          </div>
+          <div style="padding:.75rem 1rem;border-radius:6px;font-size:.83rem;
+                      color:var(--text);line-height:1.65;border:1px solid var(--border);
+                      background:{{ di_bg }};">
+            {{ card.action }}
+          </div>
+        </div>
+
+      </div>
+    </details>
+
+  </div>
+  {% endfor %}
+
+  {# Fallback notice — shown only when LLM was unavailable #}
+  {% if not di.llm_used and di.fallback_reason %}
+  <div style="font-size:.73rem;color:var(--text3);margin-top:.5rem;
+              padding:.4rem .75rem;background:var(--bg3);border-radius:4px;">
+    AI ranking unavailable —
+    <span style="font-style:italic;">{{ di.fallback_reason }}</span>
+  </div>
+  {% endif %}
+
+</div>
+{% endif %}
+
+
 <script>
-// Rotate arrow on expand
 document.querySelectorAll('details').forEach(d => {
   d.addEventListener('toggle', () => {
-    const arrow = d.querySelector('.see-more-arrow');
+    const arrow = d.querySelector('.dm-arrow');
     if (arrow) arrow.style.transform = d.open ? 'rotate(90deg)' : '';
   });
 });

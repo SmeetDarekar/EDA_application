@@ -9,22 +9,20 @@ from abt.compare import run_comparison
 from abt.registry import ingest, list_tables, get_table_versions
 from abt.threshold_config import (
     ThresholdConfig, THRESHOLD_META, from_form, to_hidden_fields,
-    is_default, from_dict
+    is_default, from_dict,
 )
-#from abt.export import export_analysis_csv
 from services.ic_client import fetch_table_metadata, ICFetchError, test_connection
-import json
-from dataclasses import asdict
 from abt.export import export_analysis_xlsx
+from dataclasses import asdict
+import json
 
 app = Flask(__name__)
-app.secret_key = "rmeda-session-key-change-in-prod"   # needed for session storage of config
+app.secret_key = "rmeda-session-key-change-in-prod"
 
 
 # ── Threshold config helpers ──────────────────────────────────────────────────
 
 def _load_cfg() -> ThresholdConfig:
-    """Load ThresholdConfig from session, or return defaults."""
     raw = session.get("threshold_cfg")
     if raw:
         try:
@@ -35,13 +33,11 @@ def _load_cfg() -> ThresholdConfig:
 
 
 def _save_cfg(cfg: ThresholdConfig):
-    """Persist ThresholdConfig into session."""
     session["threshold_cfg"] = asdict(cfg)
     session.modified = True
 
 
 def _cfg_template_vars(cfg: ThresholdConfig) -> dict:
-    """Return template variables needed by analyze_select / compare_select."""
     return {
         "cfg_is_default": is_default(cfg),
         "cfg_hidden":     to_hidden_fields(cfg),
@@ -82,6 +78,7 @@ def _safe_parse_json(raw: str) -> dict:
 
 
 # ── Home ──────────────────────────────────────────────────────────────────────
+
 @app.route("/")
 def home():
     tables = list_tables()
@@ -92,7 +89,6 @@ def home():
 
 @app.route("/config")
 def config_page():
-    """Render the threshold configuration page."""
     return_to = request.args.get("return_to", "analyze")
     cfg = _load_cfg()
     return render_template(
@@ -106,7 +102,6 @@ def config_page():
 
 @app.route("/config/save", methods=["POST"])
 def config_save():
-    """Save user-submitted thresholds to session and redirect back."""
     return_to = request.form.get("return_to", "analyze")
     cfg = from_form(request.form)
     _save_cfg(cfg)
@@ -117,7 +112,6 @@ def config_save():
 
 @app.route("/config/reset")
 def config_reset():
-    """Clear custom thresholds from session (revert to defaults)."""
     return_to = request.args.get("return_to", "analyze")
     session.pop("threshold_cfg", None)
     if return_to == "compare":
@@ -126,6 +120,7 @@ def config_reset():
 
 
 # ── Ingest ────────────────────────────────────────────────────────────────────
+
 @app.route("/ingest", methods=["GET"])
 def ingest_page():
     return render_template("ingest.html")
@@ -135,10 +130,8 @@ def ingest_page():
 def ingest_submit():
     table_name = request.form.get("table_name", "").strip()
     raw_json   = request.form.get("metadata_json", "").strip()
-
     if not table_name or not raw_json:
         return render_template("ingest.html", error="Table name and metadata JSON are required.")
-
     try:
         metadata = _safe_parse_json(raw_json)
         if isinstance(metadata, list):
@@ -154,6 +147,7 @@ def ingest_submit():
 
 
 # ── Fetch from IC ─────────────────────────────────────────────────────────────
+
 @app.route("/fetch-ic", methods=["GET"])
 def fetch_ic_page():
     return render_template("fetch_ic.html")
@@ -163,25 +157,20 @@ def fetch_ic_page():
 def fetch_ic_submit():
     table_name = request.form.get("table_name", "").strip()
     caslib     = request.form.get("caslib", "").strip() or None
-
     if not table_name:
         return render_template("fetch_ic.html", error="Table name is required.")
-
     try:
         payload = fetch_table_metadata(table_name=table_name, caslib=caslib)
-
         if payload is None:
             return render_template("fetch_ic.html",
                 error=f"Table '{table_name}' not found in Information Catalog."
                       + (f" (library: {caslib})" if caslib else ""))
-
         result = ingest(table_name, payload)
         return render_template("ingest_result.html",
             result=result,
             table_name=table_name,
             source="Information Catalog",
             column_count=len(payload.get("items", [])))
-
     except ICFetchError as e:
         return render_template("fetch_ic.html", error=f"IC fetch failed: {e}")
     except Exception as e:
@@ -194,6 +183,7 @@ def api_ic_test():
 
 
 # ── Analyze ───────────────────────────────────────────────────────────────────
+
 @app.route("/analyze", methods=["GET"])
 def analyze_select():
     tables = list_tables()
@@ -211,10 +201,7 @@ def analyze_run():
     version    = int(request.form.get("version", 1))
     target_col = request.form.get("target_col", "").strip() or None
     use_llm    = request.form.get("use_llm") == "on"
-
-    # Thresholds: prefer form-embedded values (from hidden fields), then session, then defaults
     cfg = from_form(request.form)
-
     try:
         abt     = load_abt(table_name, version)
         results = run_analysis(abt, target_col, use_llm=use_llm, cfg=cfg)
@@ -222,8 +209,8 @@ def analyze_run():
             "analyze_results.html",
             abt=abt,
             r=results,
-            cfg=cfg,
             cfg_is_default=is_default(cfg),
+            cfg_hidden=to_hidden_fields(cfg),
         )
     except FileNotFoundError as e:
         return render_template("error.html", message=str(e))
@@ -231,56 +218,18 @@ def analyze_run():
         return render_template("error.html", message=f"Analysis failed: {e}")
 
 
- 
-# @app.route("/analyze/export-csv", methods=["POST"])
-# def analyze_export_csv():
-#     table_name = request.form.get("table_name", "").strip()
-#     version    = int(request.form.get("version", 1))
-#     target_col = request.form.get("target_col", "").strip() or None
- 
-#     # Respect active threshold config (same as analyze_run)
-#     from abt.threshold_config import from_form
-#     cfg = from_form(request.form)
- 
-#     try:
-#         from flask import Response
-#         abt     = load_abt(table_name, version)
-#         results = run_analysis(abt, target_col, use_llm=False, cfg=cfg)
-#         csv_str = export_analysis_csv(abt, results)
- 
-#         filename = f"{table_name}_v{version}_analysis.csv"
-#         return Response(
-#             csv_str,
-#             mimetype="text/csv",
-#             headers={"Content-Disposition": f"attachment; filename={filename}"}
-#         )
-#     except FileNotFoundError as e:
-#         return render_template("error.html", message=str(e))
-#     except Exception as e:
-#         return render_template("error.html", message=f"CSV export failed: {e}")
-
-
-
-
-
-
-
 @app.route("/analyze/export-xlsx", methods=["POST"])
 def analyze_export_xlsx():
     table_name = request.form.get("table_name", "").strip()
     version    = int(request.form.get("version", 1))
     target_col = request.form.get("target_col", "").strip() or None
- 
-    from abt.threshold_config import from_form
     cfg = from_form(request.form)
- 
     try:
         from flask import Response
-        abt      = load_abt(table_name, version)
-        results  = run_analysis(abt, target_col, use_llm=False, cfg=cfg)
+        abt        = load_abt(table_name, version)
+        results    = run_analysis(abt, target_col, use_llm=False, cfg=cfg)
         xlsx_bytes = export_analysis_xlsx(abt, results)
- 
-        filename = f"{table_name}_v{version}_analysis.xlsx"
+        filename   = f"{table_name}_v{version}_analysis.xlsx"
         return Response(
             xlsx_bytes,
             mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -290,29 +239,10 @@ def analyze_export_xlsx():
         return render_template("error.html", message=str(e))
     except Exception as e:
         return render_template("error.html", message=f"Export failed: {e}")
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # ── Compare ───────────────────────────────────────────────────────────────────
+
 @app.route("/compare", methods=["GET"])
 def compare_select():
     tables = list_tables()
@@ -326,7 +256,6 @@ def compare_select():
 
 @app.route("/compare/versions", methods=["POST"])
 def compare_versions():
-    """Form step: given table name, return its versions."""
     table_name = request.form.get("table_name", "").strip()
     versions   = get_table_versions(table_name) or []
     tables     = list_tables()
@@ -342,8 +271,11 @@ def compare_versions():
 
 @app.route("/compare/run", methods=["POST"])
 def compare_run():
-    table_name = request.form.get("table_name", "").strip()
-    ver_list   = request.form.getlist("versions")
+    table_name  = request.form.get("table_name",  "").strip()
+    ver_list    = request.form.getlist("versions")
+    domain      = request.form.get("domain",      "credit_risk").strip() or "credit_risk"
+    abt_purpose = request.form.get("abt_purpose", "pd").strip()          or "pd"
+    stage       = request.form.get("stage",       "back_testing").strip() or "back_testing"
 
     if len(ver_list) < 2:
         tables   = list_tables()
@@ -355,33 +287,167 @@ def compare_run():
             selected_table=table_name,
             versions=versions,
             error="Select at least 2 versions to compare.",
+            selected_domain=domain,
+            selected_purpose=abt_purpose,
             **_cfg_template_vars(cfg),
         )
-
-    # Thresholds: prefer form-embedded hidden fields
     cfg = from_form(request.form)
-
     try:
         abts    = [load_abt(table_name, int(v)) for v in ver_list]
         use_llm = request.form.get("use_llm") == "on"
-        results = run_comparison(abts, use_llm=use_llm, cfg=cfg)
+        results = run_comparison(
+            abts,
+            use_llm     = use_llm,
+            domain      = domain,
+            abt_purpose = abt_purpose,
+            stage       = stage,
+        )
         return render_template(
             "compare_results.html",
             abts=abts,
             r=results,
             version_labels=[a.abt_name for a in abts],
-            cfg=cfg,
             cfg_is_default=is_default(cfg),
+            cfg_hidden=to_hidden_fields(cfg),
         )
     except FileNotFoundError as e:
         return render_template("error.html", message=str(e))
     except Exception as e:
         import traceback
         tb = traceback.format_exc()
-        return render_template("error.html", message=f"Comparison failed: {e}<br><pre>{tb}</pre>")
+        return render_template("error.html",
+                               message=f"Comparison failed: {e}<br><pre>{tb}</pre>")
+
+
+@app.route("/compare/run", methods=["GET"])
+def compare_run_get():
+    """Re-runs comparison from query params (back-link from decision view)."""
+    table_name = request.args.get("table_name", "").strip()
+    ver_list   = request.args.getlist("versions")
+    if not table_name or len(ver_list) < 2:
+        return redirect(url_for("compare_select"))
+    cfg = _load_cfg()
+    try:
+        abts    = [load_abt(table_name, int(v)) for v in ver_list]
+        results = run_comparison(abts, use_llm=False)
+        return render_template(
+            "compare_results.html",
+            abts=abts,
+            r=results,
+            version_labels=[a.abt_name for a in abts],
+            cfg_is_default=is_default(cfg),
+            cfg_hidden=to_hidden_fields(cfg),
+        )
+    except FileNotFoundError as e:
+        return render_template("error.html", message=str(e))
+    except Exception as e:
+        import traceback
+        return render_template("error.html",
+                               message=f"Comparison failed: {e}<br><pre>{traceback.format_exc()}</pre>")
+
+
+# ── Decision View (Phase 1 + Phase 2) ────────────────────────────────────────
+
+@app.route("/compare/decision", methods=["GET", "POST"])
+def decision_view():
+    """
+    Decision Intelligence view.
+    Phase 1 : build_business_insights() — 7 structured insight cards.
+    Phase 2 : synthesise_drift_insights_v2() — AI-ranked drift signals via
+              3-call LLM chain; already stored in results["drift_insights"]
+              by run_comparison(); passed to template as r=results.
+    POST: called from compare_results "Decision View" button.
+    GET:  called from stage selector inside the decision view itself.
+    """
+    if request.method == "POST":
+        table_name  = request.form.get("table_name",  "").strip()
+        ver_list    = request.form.getlist("versions")
+        stage       = request.form.get("stage",       "back_testing").strip() or "back_testing"
+        domain      = request.form.get("domain",      "credit_risk").strip()  or "credit_risk"
+        abt_purpose = request.form.get("abt_purpose", "pd").strip()           or "pd"
+        use_llm     = request.form.get("use_llm") == "on"
+    else:
+        table_name  = request.args.get("table_name",  "").strip()
+        ver_list    = request.args.getlist("versions")
+        stage       = request.args.get("stage",       "back_testing").strip() or "back_testing"
+        domain      = request.args.get("domain",      "credit_risk").strip()  or "credit_risk"
+        abt_purpose = request.args.get("abt_purpose", "pd").strip()           or "pd"
+        use_llm     = True   # always re-enrich on stage change GET
+
+    if not table_name or len(ver_list) < 2:
+        tables = list_tables()
+        cfg    = _load_cfg()
+        return render_template(
+            "compare_select.html",
+            tables=tables,
+            error="Select at least 2 versions.",
+            **_cfg_template_vars(cfg),
+        )
+
+    cfg = _load_cfg()
+    try:
+        abts    = [load_abt(table_name, int(v)) for v in ver_list]
+        results = run_comparison(
+            abts,
+            use_llm     = use_llm,
+            domain      = domain,
+            abt_purpose = abt_purpose,
+            stage       = stage,
+        )
+
+        # Phase 1: build structured 7-card business insights
+        try:
+            from abt.business_insights import build_business_insights
+            insights = build_business_insights(results, stage=stage)
+        except Exception:
+            insights = []
+
+        # I7 drives the verdict banner
+        i7 = results.get("i7", {})
+        overall_decision = i7.get("decision", results.get("c0", {}).get("verdict", "MONITOR"))
+        overall_message  = i7.get("reason",   results.get("c0", {}).get("message", ""))
+
+        verdict_css_map = {
+            "retrain":            "block",
+            "rebin":              "back-test-required",
+            "recalibrate":        "monitor",
+            "hold":               "clear",
+            "CLEAR":              "clear",
+            "MONITOR":            "monitor",
+            "BACK_TEST_REQUIRED": "back-test-required",
+            "BLOCK":              "block",
+        }
+        verdict_css = verdict_css_map.get(overall_decision, "monitor")
+
+        return render_template(
+            "decision_view.html",
+            # Phase 1
+            insights         = insights,
+            overall_decision = overall_decision,
+            overall_message  = overall_message,
+            verdict_css      = verdict_css,
+            # Phase 2 — full results dict so template accesses r.drift_insights
+            r                = results,
+            # Navigation context
+            version_labels   = [a.abt_name for a in abts],
+            table_name       = table_name,
+            raw_versions     = ver_list,
+            stage            = stage,
+            domain           = domain,
+            abt_purpose      = abt_purpose,
+        )
+
+    except FileNotFoundError as e:
+        return render_template("error.html", message=str(e))
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        return render_template("error.html",
+                               message=f"Decision view failed: {e}<br><pre>{tb}</pre>")
 
 
 # ── API endpoint ──────────────────────────────────────────────────────────────
+
 @app.route("/api/ingest", methods=["POST"])
 def api_ingest():
     data = request.get_json(force=True, silent=True) or {}
@@ -394,115 +460,6 @@ def api_ingest():
         return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-    """
-ADD THESE TWO ROUTES TO app.py
-─────────────────────────────────────────────────────────────────────────────
-Paste both routes into app.py after the existing compare_run route.
-Also add this import at the top of app.py:
-
-    from abt.business_insights import build_business_insights
-
-─────────────────────────────────────────────────────────────────────────────
-"""
-
-# ── Route 1: GET version of compare/run (needed for decision view back-link)
-@app.route("/compare/run", methods=["GET"])
-def compare_run_get():
-    """
-    Re-runs comparison from query params.
-    Used by decision_view.html back-link and stage switcher.
-    """
-    table_name = request.args.get("table_name", "").strip()
-    ver_list   = request.args.getlist("versions")
-
-    if not table_name or len(ver_list) < 2:
-        return redirect(url_for("compare_select"))
-
-    try:
-        abts    = [load_abt(table_name, int(v)) for v in ver_list]
-        use_llm = False   # GET re-runs skip LLM to stay fast
-        results = run_comparison(abts, use_llm=use_llm)
-        return render_template("compare_results.html", abts=abts, r=results,
-                               version_labels=[a.abt_name for a in abts])
-    except FileNotFoundError as e:
-        return render_template("error.html", message=str(e))
-    except Exception as e:
-        import traceback
-        return render_template("error.html",
-                               message=f"Comparison failed: {e}<br><pre>{traceback.format_exc()}</pre>")
-
-
-# ── Route 2: Decision view — 5-insight business layer
-@app.route("/compare/decision", methods=["GET", "POST"])
-def decision_view():
-    """
-    Decision Intelligence view.
-    POST: called from compare_run when user clicks 'Decision View'.
-    GET:  called from stage selector inside the decision view itself.
-    """
-    from abt.business_insights import build_business_insights
-
-    if request.method == "POST":
-        table_name = request.form.get("table_name", "").strip()
-        ver_list   = request.form.getlist("versions")
-        stage      = request.form.get("stage", "back_testing")
-    else:
-        table_name = request.args.get("table_name", "").strip()
-        ver_list   = request.args.getlist("versions")
-        stage      = request.args.get("stage", "back_testing")
-
-    if not table_name or len(ver_list) < 2:
-        tables   = list_tables()
-        versions = get_table_versions(table_name) or []
-        return render_template("compare_select.html", tables=tables,
-                               selected_table=table_name, versions=versions,
-                               error="Select at least 2 versions.")
-
-    try:
-        abts    = [load_abt(table_name, int(v)) for v in ver_list]
-        use_llm = request.form.get("use_llm") == "on" if request.method == "POST" else False
-        results = run_comparison(abts, use_llm=use_llm)
-
-        # Build business insights on top of existing results
-        insights = build_business_insights(results, stage=stage)
-
-        # Overall decision + message pulled from i7 (already computed)
-        i7 = results.get("i7", {})
-        overall_decision = i7.get("decision", results.get("c0", {}).get("verdict", "MONITOR"))
-        overall_message  = i7.get("reason",   results.get("c0", {}).get("message", ""))
-
-        # Map decision to CSS class for verdict banner
-        verdict_css_map = {
-            "retrain":     "back-test-required",
-            "rebin":       "monitor",
-            "recalibrate": "monitor",
-            "hold":        "clear",
-            "CLEAR":       "clear",
-            "MONITOR":     "monitor",
-            "BACK_TEST_REQUIRED": "back-test-required",
-            "BLOCK":       "block",
-        }
-        verdict_css = verdict_css_map.get(overall_decision, "monitor")
-
-        return render_template(
-            "decision_view.html",
-            insights         = insights,
-            version_labels   = [a.abt_name for a in abts],
-            table_name       = table_name,
-            raw_versions     = ver_list,
-            stage            = stage,
-            overall_decision = overall_decision,
-            overall_message  = overall_message,
-            verdict_css      = verdict_css,
-        )
-
-    except FileNotFoundError as e:
-        return render_template("error.html", message=str(e))
-    except Exception as e:
-        import traceback
-        return render_template("error.html",
-                               message=f"Decision view failed: {e}<br><pre>{traceback.format_exc()}</pre>")
 
 
 if __name__ == "__main__":
