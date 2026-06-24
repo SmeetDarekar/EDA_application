@@ -1,4 +1,4 @@
-# RMEDA Service — Risk Modeling Exploratory Data Analysis
+# EDA Service — Exploratory Data Analysis
 
 RMEDA is a Flask web application designed for Risk Modeling teams to ingest, analyze, and compare consecutive versions of **Analytic Base Tables (ABT)**. It evaluates data quality, features usability, target stability, and drift metrics using both rule-based algorithms (Tier A), hybrid validators (Tier C), and LLM-powered narrative insights (Tier B).
 
