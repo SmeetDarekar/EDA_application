@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .env
+.env.example
 venv/
 csv_report/
 datadump/

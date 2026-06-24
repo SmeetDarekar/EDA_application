@@ -2,6 +2,10 @@
 app.py — Flask entry point for RMEDAService
 """
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, render_template, request, redirect, url_for, jsonify, session
 from abt.columnProfile import load_abt
 from abt.analyze import run_analysis
@@ -399,6 +403,8 @@ def decision_view():
         try:
             from abt.business_insights import build_business_insights
             insights = build_business_insights(results, stage=stage)
+            from abt.insight_validator import validate_insights
+            insights = validate_insights(insights, results, use_llm=use_llm)
         except Exception:
             insights = []
 

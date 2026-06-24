@@ -23,6 +23,24 @@ LLM_TIMEOUT = 30
 LLM_MAX_TOKENS = 600   # keep responses concise
 
 # ── Provider definitions ──────────────────────────────────────────────────────
+def _get_azure_url() -> str:
+    endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT", "").strip().rstrip('"').rstrip("'").rstrip("/")
+    if endpoint.endswith("%22"):
+        endpoint = endpoint[:-3]
+    endpoint = endpoint.rstrip("/")
+    if not endpoint:
+        return ""
+    if "/openai/deployments/" in endpoint:
+        return endpoint
+    deployment = os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o").strip()
+    api_version = os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-15-preview").strip()
+    return f"{endpoint}/openai/deployments/{deployment}/chat/completions?api-version={api_version}"
+
+
+def _get_azure_key() -> str:
+    return os.environ.get("AZURE_OPENAI_KEY", "").strip().rstrip('"').rstrip("'")
+
+
 PROVIDERS = {
     "anthropic": {
         "api_url":  "https://api.anthropic.com/v1/messages",
@@ -62,13 +80,9 @@ PROVIDERS = {
     },
 
     "azure_openai": {
-        # Set AZURE_OPENAI_ENDPOINT as full URL incl. deployment name
-        # "api_url":  os.environ.get("AZURE_OPENAI_ENDPOINT", ""),
-        # "api_key":  os.environ.get("AZURE_OPENAI_KEY", ""),
-        # "model":    os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o"),
-        "api_url":  "",
-        "api_key":  "", 
-        "model":    "gpt-4.1",
+        "api_url":  _get_azure_url(),
+        "api_key":  _get_azure_key(),
+        "model":    os.environ.get("AZURE_OPENAI_DEPLOYMENT", "gpt-4o").strip(),
         "headers":  lambda key: {
             "Content-Type": "application/json",
             "api-key":      key,
