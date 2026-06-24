@@ -129,34 +129,26 @@ graph TD
 
 ---
 
-## 4. Redundant, Dead, and Unused Code ("Code Not Required")
+## 4. Cleanup Status & Removed Code
 
-Below is the list of files, template documents, and duplicate code blocks that are **not required** by the application and can be safely archived or deleted.
+Below is the status of the redundant, dead, and unused code in the repository:
 
-### A. Commented Duplicate Code Blocks inside Active Files
-These sections of code are commented out duplicates of active code located within the same file. They serve no functional purpose.
+### A. Commented Duplicate Code Blocks inside Active Files (Cleaned)
+The commented-out duplicates of module contents inside the following files have been successfully removed:
+*   `abt/analyze.py`
+*   `abt/compare.py`
+*   `abt/llm_insights.py`
 
-*   **[analyze.py](file:///c:/Smeet_internTask/analysisWork3/abt/analyze.py)**:
-    *   **Lines 1 to 403**: A fully commented duplicate of the entire module code.
-*   **[compare.py](file:///c:/Smeet_internTask/analysisWork3/abt/compare.py)**:
-    *   **Lines 1 to 850**: Commented duplicate of the compare functions.
-    *   **Lines 851 to 1600**: A second commented duplicate block of the compare functions.
-*   **[interpretations.py](file:///c:/Smeet_internTask/analysisWork3/abt/interpretations.py)**:
-    *   **Lines 1 to 800**: A commented duplicate of the interpretation functions.
-    *   **Lines 801 to 1600**: A second commented duplicate block of the same functions.
+### B. Overridden Wrapper Functions inside Active Files (Cleaned)
+The legacy overrides block at the bottom of `abt/interpretations.py` has been deleted, successfully restoring the full implementations of `run_interpretations`, `run_interpretations_hybrid`, and `run_interpretations_enhanced`.
 
-### B. Overridden Wrapper Functions inside Active Files
-At the bottom of [interpretations.py](file:///c:/Smeet_internTask/analysisWork3/abt/interpretations.py) (lines 3046–3135), the active wrapper functions are overridden:
-*   `run_interpretations` (lines 3046–3118): Only calls compare-related metrics (`i4`–`i9`) and completely omits single-version analysis metrics (`i1`–`i3`), breaking the single-version dashboard's interpretation tab.
-*   `run_interpretations_hybrid` (lines 3120–3126): Overwrites the actual hybrid logic defined earlier (lines 2990–3018) and returns `results` unmodified, rendering the hybrid validator tier inactive.
-*   `run_interpretations_enhanced` (lines 3129–3135): Overwrites the actual enhanced logic defined earlier (lines 2692–2771) and returns `results` unmodified, rendering the enhanced narrative tier inactive.
+### C. Unused Templates (Deleted)
+The following unused templates have been deleted from the `templates/` folder:
+*   `templates/analyze_resultsnoAI.html`
+*   `templates/compare_results_noAI.html`
 
-### C. Unused Templates
-These HTML templates are left over in the `templates` directory but are **never** rendered by any route in the application:
-*   **[analyze_resultsnoAI.html](file:///c:/Smeet_internTask/analysisWork3/templates/analyze_resultsnoAI.html)**: Not used. The primary [analyze_results.html](file:///c:/Smeet_internTask/analysisWork3/templates/analyze_results.html) covers cases both with and without AI.
-*   **[compare_results_noAI.html](file:///c:/Smeet_internTask/analysisWork3/templates/compare_results_noAI.html)**: Not used. [compare_results.html](file:///c:/Smeet_internTask/analysisWork3/templates/compare_results.html) is the active template.
+### D. Scratch and Test Scripts (Deleted)
+The following developer utility scratch scripts have been deleted from the root folder:
+*   `migrate.py`
+*   `test_llm.py`
 
-### D. Scratch and Test Scripts
-These files are developer utility scripts that are not part of the runtime web application:
-*   **[migrate.py](file:///c:/Smeet_internTask/analysisWork3/migrate.py)**: Used once to add `version` and `name` tags to historical data in the registry.
-*   **[test_llm.py](file:///c:/Smeet_internTask/analysisWork3/test_llm.py)**: Used to verify connection to the LLM client API.

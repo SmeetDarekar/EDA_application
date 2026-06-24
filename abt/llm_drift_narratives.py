@@ -942,22 +942,17 @@ Your goal is to translate statistical changes into clear business risk impact fo
 
 STRICT RULES:
 
-1. Headline: ≤20 words.
+1. Headline: MUST strictly follow this exact template structure:
+"It is observed that [feature concept] has shifted towards [higher/lower value group]. This indicates that [consequence on scoring/default behavior]."
 
-You MUST internally derive the headline using this chain:
-- Step 1: Identify what kind of customers increased/decreased (e.g., higher income, lower balance, riskier profiles)
-- Step 2: Recall how such customers behave in credit risk (higher/lower default likelihood)
-- Step 3: Translate into a business risk impact (bias, underestimation, instability, score distortion)
-
-Then write a single headline capturing:
-Population shift + Risk consequence
+Placeholders guidelines:
+- [feature concept]: A human-friendly business description of the underlying feature or customer attributes (e.g. "average income", "borrower debt burden", "repayment stability", "historical credit utilisation"), NOT raw database column names like "dti" or "inc".
+- [higher/lower value group]: The group or direction of the shift based on the FACT SHEET (e.g., "higher values", "lower income brackets", "elevated debt levels", "lower credit tiers").
+- [consequence on scoring/default behavior]: The business risk impact or consequence on the model's default predictions or score accuracy (e.g., "overall default risk may be underestimated", "repayment scores might be artificially inflated", "scorecard stability could be compromised").
 
 STRICT:
-- No column names, metric names, or numbers
-- No statistical descriptions (mean increased, distribution shifted)
-- Must mention risk impact explicitly (not just change)
-
-If the headline does NOT contain a risk consequence, it is incorrect.
+- No raw database column names (e.g. do NOT use "dti", "inc") or acronyms (like PSI, FSI, WoE). Use the human-friendly business descriptions instead.
+- If the headline does NOT follow the exact template above, it is incorrect.
 
 2. Evidence: exactly 2 sentences.
    - Sentence 1: Report the numerical changes from FACT SHEET (at least 2 values exactly as given).
@@ -1118,9 +1113,9 @@ def _llm_call_2_card(
         card["triage_reason"] = theme.get("triage_reason", "")
         return card
 
-    except Exception:
+    except Exception as e:
         return _rule_based_card_for_theme(theme, domain_label, purpose_label,
-                                           i7_decision, input_sev)
+                                           i7_decision, input_sev, error=str(e))
 
 
 def _theme_to_domain(theme_id: str) -> str:
@@ -1143,6 +1138,7 @@ def _rule_based_card_for_theme(
     purpose_label: str = "",
     i7_decision:   str = "hold",
     severity:      str = "medium",
+    error:         str = "",
 ) -> dict:
     """
     Fallback card when LLM call 2 fails for a theme.
@@ -1185,6 +1181,7 @@ def _rule_based_card_for_theme(
         "source":   f"theme_{theme.get('theme_id', 'unknown')}_fallback",
         "columns":  cols,
         "psi":      psi,
+        "error":    error,
     }
 
 
@@ -1291,25 +1288,35 @@ def synthesise_drift_insights_v2(
 
         # Step 2: card synthesis — one LLM call per theme
         cards: List[dict] = []
+        errors = []
         for i, theme in enumerate(themes[:max_cards]):
             card = _llm_call_2_card(theme, domain, abt_purpose, i7, c0, stage)
             card["rank"] = i + 1
+            if card.get("error"):
+                errors.append(card["error"])
             cards.append(card)
 
+        # If all cards failed to generate via LLM, treat it as LLM failed
+        llm_used = True
+        fallback_reason = None
+        if len(cards) > 0 and len(errors) == len(cards):
+            llm_used = False
+            fallback_reason = f"LLM card generation failed: {errors[0]}"
+
         # Step 3: meta narrative (optional)
-        meta_narrative = _llm_call_3_meta(cards, i7, c0, domain)
+        meta_narrative = _llm_call_3_meta(cards, i7, c0, domain) if llm_used else None
 
         return {
             "cards":           cards,
             "meta_narrative":  meta_narrative,
             "all_signals":     signals,
             "themes":          themes,
-            "llm_used":        True,
+            "llm_used":        llm_used,
             "domain":          domain,
             "abt_purpose":     abt_purpose,
             "domain_label":    DOMAIN_LABELS.get(domain, domain),
             "purpose_label":   PURPOSE_LABELS.get(abt_purpose, abt_purpose),
-            "fallback_reason": None,
+            "fallback_reason": fallback_reason,
         }
 
     except Exception as e:
