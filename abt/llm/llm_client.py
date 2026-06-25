@@ -8,7 +8,7 @@ Business logic NEVER imports this directly — use llm_insights.py instead.
 import json
 import urllib.request
 import urllib.error
-from .llm_config import get_provider, LLM_TIMEOUT, LLM_MAX_TOKENS
+from abt.llm.llm_config import get_provider, LLM_TIMEOUT, LLM_MAX_TOKENS
 
 
 def call_llm(system: str, user: str, max_tokens: int = LLM_MAX_TOKENS) -> str:

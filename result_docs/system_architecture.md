@@ -1,6 +1,6 @@
-# RMEDA — System Architecture Blueprint
+# EDA — System Architecture Blueprint
 
-This document details the software architecture, component models, data flows, and integration paradigms of the **Risk Modeling Exploratory Data Analysis (RMEDA)** system.
+This document details the software architecture, component models, data flows, and integration paradigms of the **Exploratory Data Analysis (EDA)** system.
 
 ---
 
@@ -77,15 +77,15 @@ flowchart TD
 
 | Component Module | Files | Architectural Role | Key Responsibilities |
 |:---|:---|:---|:---|
-| **Web Server & UI** | [app.py](file:///c:/Smeet_internTask/analysisWork3/app.py)<br>templates/<br>static/ | **MVC Controller & View** | Exposes HTTP routes, handles stages and threshold configuration states, routes user requests to comparative engines, and renders results. |
-| **Ingestion & Registry** | [abt/registry.py](file:///c:/Smeet_internTask/analysisWork3/abt/registry.py)<br>datadump/ | **Data Ingestion Engine** | Receives metadata payloads from upstream catalogs (IC), saves snapshots as local JSON records, and maintains dataset version indexes. |
-| **Data Models** | [abt/columnProfile.py](file:///c:/Smeet_internTask/analysisWork3/abt/columnProfile.py) | **Domain Representation** | Reconstructs metadata into Python objects (`ABTProfile`, `ColumnProfile`) and formats statistical structures. |
-| **Analysis Engine** | [abt/analyze.py](file:///c:/Smeet_internTask/analysisWork3/abt/analyze.py)<br>[abt/threshold_config.py](file:///c:/Smeet_internTask/analysisWork3/abt/threshold_config.py) | **Single-Version Auditor** | Calculates version scores, identifies data quality blockers, audits data governance/privacy risks, and produces remediation action lists. |
-| **Comparison & Metrics** | [abt/compare.py](file:///c:/Smeet_internTask/analysisWork3/abt/compare.py)<br>[abt/drift_metrics.py](file:///c:/Smeet_internTask/analysisWork3/abt/drift_metrics.py) | **Multi-Version Evaluator** | Executes version comparisons. Computes math-heavy metrics (Basel PSI, quantile variance, standard deviation shifts) across consecutive datasets. |
-| **Tier A Decision Engine** | [abt/interpretations.py](file:///c:/Smeet_internTask/analysisWork3/abt/interpretations.py) | **Rule-Based Decision Engine** | Deduces statistical causes (organic shift, sampling change, pipeline issues, label event) and recommends models actions (`rebin`, `retrain`, `hold`). |
-| **Decision Intelligence** | [abt/business_insights.py](file:///c:/Smeet_internTask/analysisWork3/abt/business_insights.py) | **Business Insight Director** | Maps complex statistical metrics into 5 fixed business slots (Population, Target, Pipeline, Scoring Risk, Governance). |
-| **AI Validator (Guardrail)**| [abt/insight_validator.py](file:///c:/Smeet_internTask/analysisWork3/abt/insight_validator.py) | **Safety Layer (Tier C)** | Intercepts Rule-Based insights and uses LLM verification to correct illogical recommendations (e.g. preventing the dropping of key risk predictors). |
-| **AI Narrator & Chaining** | [abt/llm_drift_narratives.py](file:///c:/Smeet_internTask/analysisWork3/abt/llm_drift_narratives.py)<br>[abt/llm_client.py](file:///c:/Smeet_internTask/analysisWork3/abt/llm_client.py)<br>[abt/llm_config.py](file:///c:/Smeet_internTask/analysisWork3/abt/llm_config.py) | **AI Narrative & Ranking Layer** | Executes the 3-LLM prompt chain to rank, narrate, and connect drift findings into a unified business story. |
+| **Web Server & UI** | [app.py](app.py)<br>templates/<br>static/ | **MVC Controller & View** | Exposes HTTP routes, handles stages and threshold configuration states, routes user requests to comparative engines, and renders results. |
+| **Ingestion & Registry** | [abt/registry.py](abt/registry.py)<br>datadump/ | **Data Ingestion Engine** | Receives metadata payloads from upstream catalogs (IC), saves snapshots as local JSON records, and maintains dataset version indexes. |
+| **Data Models** | [abt/columnProfile.py](abt/columnProfile.py) | **Domain Representation** | Reconstructs metadata into Python objects (`ABTProfile`, `ColumnProfile`) and formats statistical structures. |
+| **Analysis Engine** | [abt/analyze.py](abt/analyze.py)<br>[abt/threshold_config.py](abt/threshold_config.py) | **Single-Version Auditor** | Calculates version scores, identifies data quality blockers, audits data governance/privacy risks, and produces remediation action lists. |
+| **Comparison & Metrics** | [abt/compare.py](abt/compare.py)<br>[abt/drift_metrics.py](abt/drift_metrics.py) | **Multi-Version Evaluator** | Executes version comparisons. Computes math-heavy metrics (Basel PSI, quantile variance, standard deviation shifts) across consecutive datasets. |
+| **Tier A Decision Engine** | [abt/interpretations.py](abt/interpretations.py) | **Rule-Based Decision Engine** | Deduces statistical causes (organic shift, sampling change, pipeline issues, label event) and recommends models actions (`rebin`, `retrain`, `hold`). |
+| **Decision Intelligence** | [abt/business_insights.py](abt/business_insights.py) | **Business Insight Director** | Maps complex statistical metrics into 5 fixed business slots (Population, Target, Pipeline, Scoring Risk, Governance). |
+| **AI Validator (Guardrail)**| [abt/insight_validator.py](abt/insight_validator.py) | **Safety Layer (Tier C)** | Intercepts Rule-Based insights and uses LLM verification to correct illogical recommendations (e.g. preventing the dropping of key risk predictors). |
+| **AI Narrator & Chaining** | [abt/llm_drift_narratives.py](abt/llm_drift_narratives.py)<br>[abt/llm_client.py](abt/llm_client.py)<br>[abt/llm_config.py](abt/llm_config.py) | **AI Narrative & Ranking Layer** | Executes the 3-LLM prompt chain to rank, narrate, and connect drift findings into a unified business story. |
 
 ---
 

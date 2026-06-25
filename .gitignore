@@ -6,3 +6,4 @@ venv/
 csv_report/
 datadump/
 datadump/registry.json
+extra/
