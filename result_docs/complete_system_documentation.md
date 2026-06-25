@@ -143,6 +143,31 @@ graph TD
 * **I8 Pipeline Breaks**: Identifies schema conflicts.
 * **I9 Pipeline Health**: Summarizes completeness trends.
 
+### Decision View Section (The Executive Control Panel)
+The Decision View is the key interface for risk officers. It synthesizes statistical metrics into actionable business decisions and natural language narratives through three phases:
+
+#### 1. The 7 Structured Business Cards (Phase 1)
+Orchestrated by `build_business_insights(results, stage)` inside [abt/insights/business_insights.py](abt/insights/business_insights.py), this module generates 7 standardized cards for the business panel. They are dynamically reordered via `_reorder(insights)` to prioritize critical blocker issues (e.g. data loss or target events) at the front:
+* **Drift Stories (Slots 1, 2, & 3)**: Diagnoses the top three drifted columns using [abt/insights/signal_collector.py](abt/insights/signal_collector.py). Translates statistical metrics (PSI, KS, variance shift) into a defined business shift (e.g., center shift or boundary change) with qualitative evidence and recommended model remediation actions.
+* **Target Behavior (Slot 4)**: Maps event-rate trends (`i5`) to target variable definition shifts.
+* **Pipeline Quality (Slot 5)**: Translates completeness trajectories (`i9`) into alerts for data loss or schema quality regressions.
+* **Model Scoring Risk (Slot 6)**: Fuses model actions (`i7`) and pipeline break risks (`i8`) to flag out-of-boundary model extrapolation risks.
+* **Governance & Fairness (Slot 7)**: Flags sensitive variables (`informationPrivacy=private` flagged in `s4`) that exhibit notable drift (PSI > 0.10) to alert compliance officers of potential bias.
+
+#### 2. The 3-LLM Narrative Chaining Engine (Phase 2)
+When the user requests AI analysis, the comparative engine invokes the 3-step prompt chain defined in [abt/llm/llm_synthesis.py](abt/llm/llm_synthesis.py) using the configured prompts in [abt/llm/llm_prompts.py](abt/llm/llm_prompts.py):
+1. **Drift Triage (Call 1)**: Accepts the signal pool grouped by logical themes and ranks them in order of priority based on model purpose and business impact.
+2. **Card Synthesis (Call 2)**: Triggers an isolated narrative generation call for the top triaged themes. Enforces exact anchors (`I7_DECISION`, `C0_VERDICT`) to prevent hallucinated contradictions, providing quantitative details (e.g., specific shifts towards "lower-income brackets").
+3. **Meta Portfolio Narrative (Call 3)**: Combines individual card headlines into a single connecting summary sentence representing the overall credit risk exposure.
+
+#### 3. The Validation Guardrail Layer (Phase 3)
+To ensure recommendations align with corporate risk policies, they pass through **[abt/insights/insight_validator.py](abt/insights/insight_validator.py)**:
+* **Pass 1: Hard Rules**: Evaluates deterministic logic, such as:
+  * *Rule 1*: Replaces any "drop variable" advice for private columns with a governance review requirement.
+  * *Rule 2*: Redirects model retrains to pipeline engineering fixes if the drift is due to technical missingness/data loss.
+  * *Rule 6*: Strips all model actions if the overall dataset comparison verdict is `BLOCK`.
+* **Pass 2: LLM Review (Optional)**: If a rule is triggered and `use_llm` is active, it formats the structured facts and rules for an LLM validator call, strictly parsing the response in JSON format to adjust card narration safely.
+
 ---
 
 ## 6. What We Have Achieved (Milestones Met)
