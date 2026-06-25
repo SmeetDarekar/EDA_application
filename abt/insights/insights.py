@@ -32,7 +32,7 @@ Design contract:
 from __future__ import annotations
 import math
 from typing import Dict, List, Optional, Tuple
-from .columnProfile import ColumnProfile, ABTProfile
+from abt.analysis.columnProfile import ColumnProfile, ABTProfile
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTS
