@@ -6,7 +6,7 @@ This document details the software architecture, component models, data flows, a
 
 ## 1. Architectural Overview
 
-RMEDA is a metadata-driven decision intelligence system. By constraint, it never touches raw datasets. Instead, it reads pre-computed statistical summaries (KPIs, column profiles, missingness states, and quantile distributions) from SAS or the SAS Information Catalog (IC).
+EDA is a metadata-driven decision intelligence system. By constraint, it never touches raw datasets. Instead, it reads pre-computed statistical summaries (KPIs, column profiles, missingness states, and quantile distributions) from SAS or the SAS Information Catalog (IC).
 
 The system follows a layered architecture model:
 
@@ -150,19 +150,19 @@ Rule-based logic checks FSI (Feature Stability Index) to recommend actions. If a
 
 ## 5. System Integration Patterns (Public Reference)
 
-The RMEDA decision engine is decoupled from storage and computing infrastructures. Teams integrating RMEDA into an existing corporate risk portal can adopt one of two integration models:
+The EDA decision engine is decoupled from storage and computing infrastructures. Teams integrating EDA into an existing corporate risk portal can adopt one of two integration models:
 
 ### Pattern A: User-Triggered Comparison (On-Demand)
 * **Model**: Integration into a model registry or verification platform (e.g., MLflow, SAS Model Manager).
 * **Workflow**:
   1. A validation scientist clicks "Compare Dataset Versions" in the UI.
-  2. The portal calls the RMEDA service passing target version identifiers.
-  3. RMEDA runs the health comparison, triggers the LLM narration, and displays the **Decision View** directly on a verification tab.
+  2. The portal calls the EDA service passing target version identifiers.
+  3. EDA runs the health comparison, triggers the LLM narration, and displays the **Decision View** directly on a verification tab.
 
 ### Pattern B: Continuous Observation & Automated Alerting
 * **Model**: Cron/Scheduled execution or event-driven pipeline observer.
 * **Workflow**:
   1. Whenever a scoring run completes (e.g., monthly scoring execution), new ABT metadata is automatically pushed to `/api/ingest`.
-  2. An observer script triggers RMEDA's comparative engine programmatically.
-  3. If RMEDA returns a verdict of `BACK_TEST_REQUIRED` or `BLOCK` (calculated dynamically in `C0`), the system triggers slack alerts, email notifications, or blocks the promotion pipeline.
+  2. An observer script triggers EDA's comparative engine programmatically.
+  3. If EDA returns a verdict of `BACK_TEST_REQUIRED` or `BLOCK` (calculated dynamically in `C0`), the system triggers slack alerts, email notifications, or blocks the promotion pipeline.
   4. The generated AI insight cards are embedded as the alert payload to give business stakeholders immediate visual diagnostic details.
