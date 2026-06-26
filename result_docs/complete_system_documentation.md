@@ -8,7 +8,7 @@ In risk modeling lifecycles (development, back-testing, pre-deployment, and prod
 
 ---
 
-## 2. Pain Points Resolved by RMEDA
+## 2. Pain Points Resolved by EDA
 1. **Manual Fragmented Analysis**: Replaces slow, manual spreadsheets with automatic single-version health checks and multi-version comparisons.
 2. **No Actionable Decisions**: Translates complex statistics (like PSI, KS, and Skewness) into concrete business decisions (e.g., retrain, rebin, recalibrate, or hold).
 3. **Data Loss vs. Real Drift (False Positives)**: Separates pipeline completeness failures (data loss) from organic customer population shifts.
@@ -17,7 +17,35 @@ In risk modeling lifecycles (development, back-testing, pre-deployment, and prod
 
 ---
 
-## 3. Overall Project Structure (Modular sub-packages)
+## 3. Business Impact & Value Realization
+
+The EDA platform bridges the gap between raw statistical data drift metrics and strategic corporate outcomes. By automating decision intelligence, the system delivers value across four primary business pillars:
+
+### A. Credit Loss Mitigation & Risk Management
+Credit scoring models (e.g., PD/LGD) represent the gatekeepers of a financial institution's balance sheet. When borrower demographics or economic indicators shift, models suffer from **extrapolation errors**. EDA detects these shifts early:
+*   **Preventing Under-pricing of Risk**: Identifies downward shifts in average borrower credit profiles before defaults spike, prompting model retrains or risk tolerance adjustments.
+*   **Avoiding Opportunity Loss**: Prevents models from overestimating risk and rejecting creditworthy candidates in modified market conditions.
+*   **Drift Velocity Safeguard**: Tracks the rate of distribution changes over time, giving risk committees early warning signs to act before model performance significantly decays.
+
+### B. Massive Reduction in Operational Overhead
+Traditional dataset validation requires risk modelers and data scientists to write bespoke scripts, compile statistical tables, and manually write lengthy analysis documents.
+*   **Immediate Diagnostics**: Automates profiling and multi-version comparisons, translating days of data analysis into real-time summaries.
+*   **Executive Translation**: Synthesizes mathematical indices (like PSI and KS) into standardized natural language business slots. Non-technical risk managers and committee chairs can make decisions without parsing raw distributions.
+
+### C. Regulatory Compliance & Governance Audit Trails
+Financial institutions operate under strict governance models (e.g., Basel guidelines, internal model validation requirements).
+*   **Audit Readiness**: The system generates formatted, professional Excel sheets containing full health rule checklists and historical comparison logs to act as official model documentation.
+*   **Algorithmic Fairness Guardrails**: Automatically monitors drift in sensitive variables (e.g., age, gender, geographic indicators marked as `private` or regulatory compliance attributes). This flags potential bias issues before models are updated.
+*   **Data Minimization (GDPR/CCPA Compliance)**: Because EDA operates entirely on metadata and never ingests raw database records, it naturally satisfies regulatory data privacy requirements by leaving PII untouched at rest in SAS catalogs.
+
+### D. Intelligent Ingestion Diagnostics (Wasted Resource Mitigation)
+Data drift alerts often lead to expensive, unnecessary model retraining exercises when the root cause is actually data ingestion issues (e.g., database connection drops or formatting changes).
+*   **Technical vs. Organic Drift**: The system separates pipeline breaks (e.g., empty categories or missing values) from real population changes.
+*   **Smart Blocking**: Directs engineers to source data fixes first and blocks automated retraining jobs on corrupted datasets, saving expensive computing resources.
+
+---
+
+## 4. Overall Project Structure (Modular sub-packages)
 Following strict Single Responsibility Principles (SRP), the core files are organized into 5 domain sub-packages under the `abt/` directory, while the root directory maintains backward-compatible forwarding wrappers:
 
 ```
@@ -78,7 +106,7 @@ abt/
 
 ---
 
-## 4. System Architecture & Dataflow
+## 5. System Architecture & Dataflow
 
 The system processes ingested metadata from SAS Information Catalog through the pipeline described below:
 
@@ -108,7 +136,7 @@ graph TD
 
 ---
 
-## 5. Description of Core Sections
+## 6. Description of Core Sections
 
 ### Single-Version Analysis (S-Sections)
 * **S0 Readiness Score**: Generates a composite readiness index (0–100) representing dataset quality.
@@ -143,9 +171,34 @@ graph TD
 * **I8 Pipeline Breaks**: Identifies schema conflicts.
 * **I9 Pipeline Health**: Summarizes completeness trends.
 
+### Decision View Section (The Executive Control Panel)
+The Decision View is the key interface for risk officers. It synthesizes statistical metrics into actionable business decisions and natural language narratives through three phases:
+
+#### 1. The 7 Structured Business Cards (Phase 1)
+Orchestrated by `build_business_insights(results, stage)` inside [abt/insights/business_insights.py](abt/insights/business_insights.py), this module generates 7 standardized cards for the business panel. They are dynamically reordered via `_reorder(insights)` to prioritize critical blocker issues (e.g. data loss or target events) at the front:
+* **Drift Stories (Slots 1, 2, & 3)**: Diagnoses the top three drifted columns using [abt/insights/signal_collector.py](abt/insights/signal_collector.py). Translates statistical metrics (PSI, KS, variance shift) into a defined business shift (e.g., center shift or boundary change) with qualitative evidence and recommended model remediation actions.
+* **Target Behavior (Slot 4)**: Maps event-rate trends (`i5`) to target variable definition shifts.
+* **Pipeline Quality (Slot 5)**: Translates completeness trajectories (`i9`) into alerts for data loss or schema quality regressions.
+* **Model Scoring Risk (Slot 6)**: Fuses model actions (`i7`) and pipeline break risks (`i8`) to flag out-of-boundary model extrapolation risks.
+* **Governance & Fairness (Slot 7)**: Flags sensitive variables (`informationPrivacy=private` flagged in `s4`) that exhibit notable drift (PSI > 0.10) to alert compliance officers of potential bias.
+
+#### 2. The 3-LLM Narrative Chaining Engine (Phase 2)
+When the user requests AI analysis, the comparative engine invokes the 3-step prompt chain defined in [abt/llm/llm_synthesis.py](abt/llm/llm_synthesis.py) using the configured prompts in [abt/llm/llm_prompts.py](abt/llm/llm_prompts.py):
+1. **Drift Triage (Call 1)**: Accepts the signal pool grouped by logical themes and ranks them in order of priority based on model purpose and business impact.
+2. **Card Synthesis (Call 2)**: Triggers an isolated narrative generation call for the top triaged themes. Enforces exact anchors (`I7_DECISION`, `C0_VERDICT`) to prevent hallucinated contradictions, providing quantitative details (e.g., specific shifts towards "lower-income brackets").
+3. **Meta Portfolio Narrative (Call 3)**: Combines individual card headlines into a single connecting summary sentence representing the overall credit risk exposure.
+
+#### 3. The Validation Guardrail Layer (Phase 3)
+To ensure recommendations align with corporate risk policies, they pass through **[abt/insights/insight_validator.py](abt/insights/insight_validator.py)**:
+* **Pass 1: Hard Rules**: Evaluates deterministic logic, such as:
+  * *Rule 1*: Replaces any "drop variable" advice for private columns with a governance review requirement.
+  * *Rule 2*: Redirects model retrains to pipeline engineering fixes if the drift is due to technical missingness/data loss.
+  * *Rule 6*: Strips all model actions if the overall dataset comparison verdict is `BLOCK`.
+* **Pass 2: LLM Review (Optional)**: If a rule is triggered and `use_llm` is active, it formats the structured facts and rules for an LLM validator call, strictly parsing the response in JSON format to adjust card narration safely.
+
 ---
 
-## 6. What We Have Achieved (Milestones Met)
+## 7. What We Have Achieved (Milestones Met)
 1. **Decoupled Configuration**: Externalized credentials, endpoints, and deployment names to `.env` files.
 2. **Setup Automation**: Created `run.ps1` and `run.bat` to automatically build virtual environments, install packages, copy configurations, and launch the server.
 3. **Code Modularization (Phase 2 & 3)**:
@@ -160,7 +213,7 @@ graph TD
 
 ---
 
-## 7. Future Enhancements & Roadmap
+## 8. Future Enhancements & Roadmap
 1. **Database Persistence**: Migrate the flat-file JSON registry to a relational database (e.g. SQLite or PostgreSQL) to scale metadata tracking.
 2. **Asynchronous LLM Processing**: Introduce Celery/Redis task workers to process prompt-chaining sequences in the background, improving request response times.
 3. **Telemetry & Latency Tracing**: Implement token counters and latency tracking to monitor prompt-chain costs and timeouts.

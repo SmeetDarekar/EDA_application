@@ -1,6 +1,6 @@
 # EDA — Future Architectural Improvements & Roadmap
 
-This document outlines key technical roadmap items for extending the Risk Model Exploratory Data Analysis (RMEDA) platform. It is split into enhancements for the metadata-only pipeline and advanced features unlocked by raw dataset access.
+This document outlines key technical roadmap items for extending the Risk Model Exploratory Data Analysis (EDA) platform. It is split into enhancements for the metadata-only pipeline and advanced features unlocked by raw dataset access.
 
 ---
 
