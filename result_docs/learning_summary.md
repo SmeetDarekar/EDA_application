@@ -1,6 +1,6 @@
 # EDA — System Learning & Architectural Summary
 
-This document serves as a comprehensive learning summary for the **Risk Model Exploratory Data Analysis (EDA)** system. It integrates the theoretical foundations, technological stack, architectural approaches, and core design patterns that govern this metadata-driven decision intelligence platform.
+This document serves as a comprehensive learning summary for the **Exploratory Data Analysis (EDA)** system. It integrates the theoretical foundations, technological stack, architectural approaches, and core design patterns that govern this metadata-driven decision intelligence platform.
 
 ---
 
